@@ -1,0 +1,18 @@
+{
+  "verbose": false,
+  "max_tokens": 100000,
+  "model_type": "gpt-4o",
+  "buffer_size": 0.05,
+  "excluded_folders_files": [
+    ".git",
+    "bin",
+    "build",
+    "node_modules",
+    "venv",
+    "__pycache__",
+    "package-lock.json",
+    "ccontext.egg-info",
+    "dist"
+  ],
+  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]"
+}
