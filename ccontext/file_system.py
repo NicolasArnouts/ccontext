@@ -1,6 +1,7 @@
 import os
 from typing import List, Tuple
 import pathspec
+from ccontext.tokenizer import tokenize_text
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -19,6 +20,21 @@ def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
         if spec.match_file(include_pattern):
             return False
     return spec.match_file(path)
+
+
+def get_file_token_length(file_path: str) -> int:
+    """Returns the token length of a file."""
+    try:
+        with open(file_path, "rb") as f:
+            header = f.read(64)
+            if b"\x00" in header:  # if binary data
+                return 0
+            f.seek(0)
+            contents = f.read().decode("utf-8")
+            tokens = tokenize_text(contents)
+            return len(tokens)
+    except Exception as e:
+        return -1
 
 
 def collect_excludes_includes(
@@ -55,7 +71,7 @@ def print_tree(
     items = sorted(os.listdir(root))
     tree_output = ""
     for item in items:
-        full_path = os.path.join(root, item)
+        full_path   = os.path.join(root, item)
         relative_path = os.path.relpath(full_path, start=root_path)
 
         if os.path.isdir(full_path):
@@ -67,8 +83,9 @@ def print_tree(
                     full_path, root_path, excludes, includes, indent + "    "
                 )
         else:
+            token_length = get_file_token_length(full_path)
             if is_excluded(relative_path, excludes, includes):
                 tree_output += f"{indent}[Excluded] 🚫📄 {relative_path}\n"
             else:
-                tree_output += f"{indent}📄 {relative_path}\n"
+                tree_output += f"{indent}📄 {token_length} {relative_path}\n"
     return tree_output

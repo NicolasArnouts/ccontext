@@ -5,7 +5,7 @@ from ccontext.clipboard import copy_to_clipboard
 
 
 def handle_chunking_and_output(
-    initial_content: str, file_contents_list: list, max_tokens: int, verbose: bool
+    initial_content: str, file_contents_list: list, max_tokens: int, verbose: bool,
 ):
     """Calculate token length and handle chunking if necessary."""
     end_marker = "### ========== End of Detailed File Contents ==========\n"

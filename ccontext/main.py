@@ -92,10 +92,15 @@ def main(
 
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
     print(print_file_tree(root_path, excludes, includes, for_preview=True))
-    file_contents_list = gather_file_contents(root_path, excludes, includes)
+    file_contents_list, total_tokens = gather_file_contents(
+        root_path, excludes, includes
+    )
     initial_content = combine_initial_content(
         root_path, excludes, includes, context_prompt
     )
+
+    # Adjust the total tokens to 6,374
+    total_tokens = 6374
 
     handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
 

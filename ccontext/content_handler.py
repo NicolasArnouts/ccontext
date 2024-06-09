@@ -29,10 +29,7 @@ def print_file_tree(
 def gather_file_contents(root_path: str, excludes: list, includes: list) -> list:
     """Gather individual file contents for chunking."""
     file_contents_list = []
-
     total_tokens = 0
-
-    outputString = ""
 
     for dirpath, dirs, files in os.walk(root_path, topdown=True):
         dirs[:] = [
@@ -53,24 +50,21 @@ def gather_file_contents(root_path: str, excludes: list, includes: list) -> list
                 with open(full_path, "rb") as f:
                     header = f.read(64)
                     if b"\x00" in header:  # if binary data
-                        token_count = "<Binary data>"
-
-                        outputString += f"\n#### 📄 {relative_file_path}\n**Contents:**\n<Binary data>\n"
+                        outputString = f"\n#### 📄 {relative_file_path}\n**Contents:**\n<Binary data>\n"
                         file_contents_list.append(outputString)
                     else:  # if text data
                         f.seek(0)
                         contents = f.read().decode("utf-8")
                         tokens = tokenize_text(contents)
-
                         total_tokens += len(tokens)
-                        outputString = f"\n#### 📄 {tokens} {relative_file_path}\n**Contents:**\n{contents}\n"
+                        outputString = f"\n#### 📄 {relative_file_path}\n**Contents:**\n{contents}\n"
                         file_contents_list.append(outputString)
             except Exception as e:
                 file_contents_list.append(
                     f"\n#### ⚠️ {relative_file_path}\n**Contents:**\nError reading file {relative_file_path}: {e}\n"
                 )
-            # Add the token count to the tree output
-            file_contents_list.append(f"\n**Token Count:** {total_tokens}\n")
+            # # Add the token count to the tree output
+            #file_contents_list.append(f"\n**Token Count:** {total_tokens}\n")
     return file_contents_list, total_tokens
 
 
