@@ -99,9 +99,6 @@ def main(
         root_path, excludes, includes, context_prompt
     )
 
-    # Adjust the total tokens to 6,374
-    total_tokens = 6374
-
     handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
 
 
