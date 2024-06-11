@@ -19,6 +19,7 @@ setup(
         "pyperclip==1.8.2",
         "tiktoken==0.7.0",
         "pathspec==0.12.1",
+        "pypdf",
     ],
     entry_points={
         "console_scripts": [

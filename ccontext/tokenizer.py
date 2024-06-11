@@ -1,6 +1,5 @@
 import tiktoken
 
-
 def set_model_type_and_buffer(model_type: str, buffer_size: float):
     """
     Sets the model type and buffer size for tokenization.
@@ -12,7 +11,6 @@ def set_model_type_and_buffer(model_type: str, buffer_size: float):
     global MODEL_TYPE, BUFFER_SIZE
     MODEL_TYPE = model_type
     BUFFER_SIZE = buffer_size
-
 
 def tokenize_text(text: str) -> list:
     """
@@ -26,7 +24,6 @@ def tokenize_text(text: str) -> list:
     """
     encoding = tiktoken.encoding_for_model(MODEL_TYPE)
     return encoding.encode(text)
-
 
 def chunk_text(file_contents: list, max_tokens: int) -> list:
     """
@@ -92,20 +89,5 @@ def chunk_text(file_contents: list, max_tokens: int) -> list:
 
     return chunks
 
-
-# Example usage
-set_model_type_and_buffer("gpt-4", 0.05)  # Set model type and buffer size
-
-# Replace the ellipsis with actual file contents, for example:
-file_contents = [
-    "This is the content of file 1.",
-    "This is the content of file 2.",
-    "This is the content of file 3.",
-    # Add more file contents as needed
-]
-
-max_tokens = 32000  # Set the maximum number of tokens per chunk
-
-chunks = chunk_text(file_contents, max_tokens)
-for i, chunk in enumerate(chunks):
-    print(f"Chunk {i + 1}: {len(tokenize_text(chunk))} tokens")
+# Set the default model type and buffer size
+set_model_type_and_buffer("gpt-4", 0.05)

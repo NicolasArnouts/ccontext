@@ -64,8 +64,6 @@ def gather_file_contents(root_path: str, excludes: list, includes: list) -> list
                 file_contents_list.append(
                     f"\n#### ⚠️ {relative_file_path}\n**Contents:**\nError reading file {relative_file_path}: {e}\n"
                 )
-            # # Add the token count to the tree output
-            # file_contents_list.append(f"\n**Token Count:** {total_tokens}\n")
     return file_contents_list, total_tokens
 
 
@@ -78,4 +76,3 @@ def combine_initial_content(
     tree_output = print_file_tree(root_path, excludes, includes, max_tokens)
 
     return f"{context_prompt}{header}{tree_output}"
-

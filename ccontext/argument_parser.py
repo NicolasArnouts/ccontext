@@ -56,6 +56,11 @@ def parse_arguments():
         action="store_true",
         help="Ignore the .gitignore file for exclusions.",
     )
+    parser.add_argument(
+        "--generate-pdf",
+        action="store_true",
+        help="Generate a PDF of the directory tree and file contents.",
+    )
 
     args, unknown = parser.parse_known_args()
     if unknown:

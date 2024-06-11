@@ -14,6 +14,7 @@ from ccontext.output_handler import handle_chunking_and_output
 from ccontext.file_system import collect_excludes_includes
 from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
+from ccontext.pdf_generator import generate_pdf  # Import the new pdf generator
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
@@ -67,6 +68,7 @@ def main(
     config_path: str = None,
     verbose: bool = False,
     ignore_gitignore: bool = False,
+    generate_pdf_flag: bool = False,  # New argument for generating PDF
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
@@ -91,7 +93,10 @@ def main(
     initialize_environment()
 
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
-    print(print_file_tree(root_path, excludes, includes, max_tokens, for_preview=True))
+    tree_output = print_file_tree(
+        root_path, excludes, includes, max_tokens, for_preview=True
+    )
+    print(tree_output)
     file_contents_list, total_tokens = gather_file_contents(
         root_path, excludes, includes
     )
@@ -99,7 +104,12 @@ def main(
         root_path, excludes, includes, context_prompt, max_tokens
     )
 
-    handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
+    if generate_pdf_flag:
+        generate_pdf(root_path, tree_output, file_contents_list)
+    else:
+        handle_chunking_and_output(
+            initial_content, file_contents_list, max_tokens, verbose
+        )
 
 
 if __name__ == "__main__":
@@ -112,4 +122,5 @@ if __name__ == "__main__":
         args.config,
         args.verbose,
         args.ignore_gitignore,
+        args.generate_pdf,  # Pass the new argument
     )

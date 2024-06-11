@@ -1,70 +1,15 @@
-# ccontext
+Sure, let's continue updating the `README.md` to include the new PDF generation feature.
 
-**ccontext (collect context)** is a cross-platform utility designed to streamline the process of gathering and sending the context of a directory to large language models (LLMs) like ChatGPT-4o. Our mission is to make collecting and sending context to an LLM as easy as possible.
+#### 📄 README.md
 
+**Updated Contents (continued):**
 
-## Features
+````markdown
+3. Generate a PDF of the directory tree and file contents:
 
-- 🌟 **Easy Setup**: Quick installation and configuration.
-- 🔧 **Configurable Exclusions and Inclusions**: Flexibly specify which files and directories to include or exclude.
-- ✂️ **Tokenization and Chunking**: Automatically handles tokenization and chunking to stay within LLM token limits.
-- 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
-- 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
-- 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
-
-## Installation
-
-### Using pip
-
-ccontext is available on PyPI and can be installed using pip:
-
-```sh
-pip install ccontext
-```
-
-### From Source
-
-1. Clone the repository:
-
-    ```sh
-    git clone https://github.com/oxillix/ccontext.git
-    cd ccontext
-    ```
-
-2. Set up a virtual environment:
-
-    ```sh
-    python3 -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    ```
-
-3. Install dependencies:
-
-    ```sh
-    pip install -r requirements.txt
-    ```
-
-4. Install the package:
-
-    ```sh
-    pip install .
-    ```
-
-## Usage
-
-### Basic Usage
-
-1. Run `ccontext` in the current folder with default settings defined in `~/.ccontext/config.json`:
-
-    ```sh
-    ccontext
-    ```
-
-2. Specify a root path, exclusions, and inclusions:
-
-    ```sh
-    ccontext -p /path/to/directory -e ".git|node_modules" -i "important_file.txt|docs"
-    ```
+   ```sh
+   ccontext -p /path/to/directory --generate-pdf
+   ```
 
 ### Command-Line Arguments
 
@@ -75,12 +20,14 @@ pip install ccontext
 - `-c, --config`: Path to a custom configuration file.
 - `-v, --verbose`: Enable verbose output to stdout.
 - `-ig, --ignore_gitignore`: Ignore the `.gitignore` file for exclusions.
+- `--generate-pdf`: Generate a PDF of the directory tree and file contents.
 
 ### Example
 
 ```sh
-ccontext -p /home/user/project -e ".git|build" -i "README.md|src"
+ccontext -p /home/user/project -e ".git|build" -i "README.md|src" --generate-pdf
 ```
+````
 
 ### Configuration
 
@@ -112,6 +59,7 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
 ## Use Cases
 
 - **Codebase Context**: Send the entire codebase as context to an LLM in one go, avoiding the need to copy and paste snippets manually.
+- **PDF Documentation**: Generate a comprehensive PDF documentation of the directory structure and file contents, with links to specific sections.
 
 ## Contributing
 
