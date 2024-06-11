@@ -91,12 +91,12 @@ def main(
     initialize_environment()
 
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
-    print(print_file_tree(root_path, excludes, includes, for_preview=True))
+    print(print_file_tree(root_path, excludes, includes, max_tokens, for_preview=True))
     file_contents_list, total_tokens = gather_file_contents(
         root_path, excludes, includes
     )
     initial_content = combine_initial_content(
-        root_path, excludes, includes, context_prompt
+        root_path, excludes, includes, context_prompt, max_tokens
     )
 
     handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)

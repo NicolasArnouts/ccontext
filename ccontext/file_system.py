@@ -65,13 +65,14 @@ def print_tree(
     root_path: str,
     excludes: List[str],
     includes: List[str],
+    max_tokens: int,
     indent: str = "",
 ) -> str:
     """Prints the file structure of the directory tree."""
     items = sorted(os.listdir(root))
     tree_output = ""
     for item in items:
-        full_path   = os.path.join(root, item)
+        full_path = os.path.join(root, item)
         relative_path = os.path.relpath(full_path, start=root_path)
 
         if os.path.isdir(full_path):
@@ -80,12 +81,20 @@ def print_tree(
             else:
                 tree_output += f"{indent}📁 {relative_path}\n"
                 tree_output += print_tree(
-                    full_path, root_path, excludes, includes, indent + "    "
+                    full_path,
+                    root_path,
+                    excludes,
+                    includes,
+                    max_tokens,
+                    indent + "    ",
                 )
         else:
             token_length = get_file_token_length(full_path)
             if is_excluded(relative_path, excludes, includes):
                 tree_output += f"{indent}[Excluded] 🚫📄 {relative_path}\n"
             else:
-                tree_output += f"{indent}📄 {token_length} {relative_path}\n"
+                if token_length > max_tokens:
+                    tree_output += f"{indent}📄 {Fore.RED}{token_length}{Style.RESET_ALL} {relative_path}\n"
+                else:
+                    tree_output += f"{indent}📄 {token_length} {relative_path}\n"
     return tree_output

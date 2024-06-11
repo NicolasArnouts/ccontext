@@ -7,10 +7,11 @@ def print_file_tree(
     root_path: str,
     excludes: list,
     includes: list,
+    max_tokens: int,
     for_preview: bool = False,
 ) -> str:
     """Print and capture the file tree section."""
-    tree_output = print_tree(root_path, root_path, excludes, includes)
+    tree_output = print_tree(root_path, root_path, excludes, includes, max_tokens)
 
     header = (
         "========== File Tree ==========\n"
@@ -64,16 +65,17 @@ def gather_file_contents(root_path: str, excludes: list, includes: list) -> list
                     f"\n#### ⚠️ {relative_file_path}\n**Contents:**\nError reading file {relative_file_path}: {e}\n"
                 )
             # # Add the token count to the tree output
-            #file_contents_list.append(f"\n**Token Count:** {total_tokens}\n")
+            # file_contents_list.append(f"\n**Token Count:** {total_tokens}\n")
     return file_contents_list, total_tokens
 
 
 def combine_initial_content(
-    root_path: str, excludes: list, includes: list, context_prompt: str
+    root_path: str, excludes: list, includes: list, context_prompt: str, max_tokens: int
 ) -> str:
     """Combine the initial content for the output."""
     context_prompt = f"## {context_prompt}\n\n"
     header = f"## Root Path: {root_path}\n\n"
-    tree_output = print_file_tree(root_path, excludes, includes)
+    tree_output = print_file_tree(root_path, excludes, includes, max_tokens)
 
     return f"{context_prompt}{header}{tree_output}"
+
