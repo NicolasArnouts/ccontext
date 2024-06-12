@@ -14,7 +14,8 @@ from ccontext.output_handler import handle_chunking_and_output
 from ccontext.file_system import collect_excludes_includes
 from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
-from ccontext.pdf_generator import generate_pdf  # Import the new pdf generator
+from ccontext.pdf_generator import generate_pdf
+from ccontext.md_generator import generate_md
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
@@ -68,7 +69,8 @@ def main(
     config_path: str = None,
     verbose: bool = False,
     ignore_gitignore: bool = False,
-    generate_pdf_flag: bool = False,  # New argument for generating PDF
+    generate_pdf_flag: bool = False,
+    generate_md_flag: bool = False,  # New argument for generating Markdown
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
@@ -106,7 +108,11 @@ def main(
 
     if generate_pdf_flag:
         generate_pdf(root_path, tree_output, file_contents_list)
-    else:
+
+    if generate_md_flag:
+        generate_md(root_path, tree_output, file_contents_list)
+
+    if not generate_pdf_flag and not generate_md_flag:
         handle_chunking_and_output(
             initial_content, file_contents_list, max_tokens, verbose
         )
@@ -122,5 +128,6 @@ if __name__ == "__main__":
         args.config,
         args.verbose,
         args.ignore_gitignore,
-        args.generate_pdf,  # Pass the new argument
+        args.generate_pdf,  # Pass the argument for generating PDF
+        args.generate_md,  # Pass the argument for generating Markdown
     )

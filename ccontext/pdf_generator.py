@@ -1,82 +1,130 @@
-from fpdf import FPDF
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    PageBreak,
+)
+from reportlab.lib.units import inch
+from reportlab.lib import colors
 import os
 import re
 
 
-class PDF(FPDF):
-    def header(self):
-        self.set_font("Arial", "B", 12)
-        self.cell(0, 10, "Directory and File Contents", 0, 1, "C")
+class PDFGenerator:
+    def __init__(self, output_path):
+        self.output_path = output_path
+        self.styles = getSampleStyleSheet()
+        self.story = []
+        self.toc = []
+        self.custom_styles = self.create_custom_styles()
 
-    def footer(self):
-        self.set_y(-15)
-        self.set_font("Arial", "I", 8)
-        self.cell(0, 10, f"Page {self.page_no()}", 0, 0, "C")
+    def create_custom_styles(self):
+        custom_styles = getSampleStyleSheet()
+        custom_styles.add(
+            ParagraphStyle(
+                name="TOC", fontSize=12, textColor=colors.blue, underline=True
+            )
+        )
+        custom_styles.add(
+            ParagraphStyle(name="FileTree", fontSize=10, leading=12, spaceAfter=6)
+        )
+        custom_styles.add(
+            ParagraphStyle(name="FileContent", fontSize=10, leading=12, spaceAfter=6)
+        )
+        return custom_styles
+
+    def create_pdf(self, tree_content, file_contents_list):
+        self.doc = SimpleDocTemplate(self.output_path, pagesize=letter)
+        self.story.append(
+            Paragraph("Directory and File Contents", self.styles["Title"])
+        )
+        self.story.append(Spacer(1, 0.2 * inch))
+        self.add_table_of_contents()
+        self.add_tree_section(tree_content)
+        self.add_file_sections(file_contents_list)
+        self.doc.build(
+            self.story,
+            onFirstPage=self.add_page_number,
+            onLaterPages=self.add_page_number,
+        )
+        print(f"PDF generated at {self.output_path}")
 
     def add_tree_section(self, tree_content):
-        self.add_page()
-        self.set_font("Arial", "B", 14)
-        self.cell(0, 10, "File Tree", 0, 1, "L")
-        self.set_font("Arial", "", 12)
-        self.multi_cell(0, 10, tree_content)
+        self.story.append(Paragraph("File Tree", self.styles["Heading2"]))
+        for line in tree_content.splitlines():
+            line = (
+                line.replace("[DIR]", "📁")
+                .replace("[FILE]", "📄")
+                .replace("[EXCLUDED]", "🚫")
+            )
+            self.story.append(Paragraph(line, self.custom_styles["FileTree"]))
+        self.story.append(PageBreak())
 
-    def add_file_section(self, file_path, file_content):
-        self.add_page()
-        self.set_font("Arial", "B", 14)
-        self.cell(0, 10, file_path, 0, 1, "L")
-        self.set_font("Arial", "", 12)
-        self.multi_cell(0, 10, file_content)
+    def add_file_sections(self, file_contents_list):
+        for file_content in file_contents_list:
+            match = re.match(
+                r"#### 📄 (.+)\n\*\*Contents:\*\*\n(.+)", file_content, re.DOTALL
+            )
+            if match:
+                file_path = match.group(1)
+                content = match.group(2)
+                section_anchor = f"section_{len(self.toc)}"
+                self.toc.append((file_path, section_anchor))
+                self.story.append(
+                    Paragraph(
+                        f'<a name="{section_anchor}">{file_path}</a>',
+                        self.styles["Heading2"],
+                    )
+                )
+                self.story.append(Spacer(1, 0.1 * inch))
+                self.story.append(
+                    Paragraph(
+                        content.replace("\n", "<br />"),
+                        self.custom_styles["FileContent"],
+                    )
+                )
+                self.story.append(PageBreak())
 
-    def add_toc(self, toc):
-        self.add_page()
-        self.set_font("Arial", "B", 14)
-        self.cell(0, 10, "Table of Contents", 0, 1, "L")
-        self.set_font("Arial", "", 12)
-        for item in toc:
-            self.cell(0, 10, item, 0, 1, "L")
+    def add_table_of_contents(self):
+        self.story.append(Paragraph("Table of Contents", self.styles["Heading2"]))
+        toc_entries = []
+        for file_path, section_anchor in self.toc:
+            toc_entries.append(
+                [
+                    Paragraph(
+                        f'<a href="#{section_anchor}">{file_path}</a>',
+                        self.custom_styles["TOC"],
+                    )
+                ]
+            )
+        if toc_entries:
+            table = Table(toc_entries, colWidths=[7 * inch])
+            table.setStyle(
+                TableStyle(
+                    [
+                        ("TEXTCOLOR", (0, 0), (-1, -1), colors.blue),
+                        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                    ]
+                )
+            )
+            self.story.append(table)
+            self.story.append(PageBreak())
+
+    def add_page_number(self, canvas, doc):
+        canvas.saveState()
+        canvas.setFont("Helvetica", 10)
+        canvas.drawString(inch, 0.75 * inch, f"Page {doc.page}")
+        canvas.restoreState()
 
 
 def generate_pdf(root_path, tree_content, file_contents_list):
-    pdf = PDF()
-    pdf.add_font(
-        "Arial", "", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", uni=True
-    )
-    pdf.add_font(
-        "Arial", "B", "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", uni=True
-    )
-    pdf.add_font(
-        "Arial",
-        "I",
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf",
-        uni=True,
-    )
-    pdf.set_auto_page_break(auto=True, margin=15)
-
-    toc = ["File Tree"]
-
-    # Add file tree section
-    pdf.add_tree_section(tree_content)
-
-    # Add file content sections
-    for file_content in file_contents_list:
-        match = re.match(
-            r"#### 📄 (.+)\n\*\*Contents:\*\*\n(.+)", file_content, re.DOTALL
-        )
-        if match:
-            file_path = match.group(1)
-            content = match.group(2)
-            toc.append(file_path)
-            pdf.add_file_section(file_path, content)
-        else:
-            toc.append("Unknown file format")
-
-    # Add table of contents
-    pdf.add_toc(toc)
-
     output_path = os.path.join(root_path, "output.pdf")
-    pdf.output(output_path)
-
-    print(f"PDF generated at {output_path}")
+    pdf_gen = PDFGenerator(output_path)
+    pdf_gen.create_pdf(tree_content, file_contents_list)
 
 
 if __name__ == "__main__":

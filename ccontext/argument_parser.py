@@ -61,6 +61,11 @@ def parse_arguments():
         action="store_true",
         help="Generate a PDF of the directory tree and file contents.",
     )
+    parser.add_argument(
+        "--generate-md",
+        action="store_true",
+        help="Generate a Markdown file of the directory tree and file contents.",
+    )
 
     args, unknown = parser.parse_known_args()
     if unknown:
