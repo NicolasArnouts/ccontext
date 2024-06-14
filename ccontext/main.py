@@ -89,12 +89,10 @@ def main(
         "context_prompt",
         DEFAULT_CONTEXT_PROMPT,
     )
-
     set_model_type_and_buffer(
         config.get("model_type", "gpt-4o"), config.get("buffer_size", 0.05)
     )
     initialize_environment()
-
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
     tree_output = print_file_tree(
         root_path, excludes, includes, max_tokens, for_preview=True
@@ -117,8 +115,7 @@ def main(
         handle_chunking_and_output(
             initial_content, file_contents_list, max_tokens, verbose
         )
-
-
+        
 if __name__ == "__main__":
     args = parse_arguments()
     main(

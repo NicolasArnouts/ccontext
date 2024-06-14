@@ -1,5 +1,4 @@
 import os
-import re
 from ccontext.file_system import is_excluded, print_tree
 from ccontext.tokenizer import tokenize_text
 
