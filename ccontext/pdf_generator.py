@@ -18,13 +18,12 @@ class PDFGenerator:
 
     def create_custom_styles(self):
         custom_styles = getSampleStyleSheet()
-
-        # Get the directory of the current script
         script_dir = os.path.dirname(os.path.abspath(__file__))
+
 
         # Register and use the Noto Emoji font for emojis
         pdfmetrics.registerFont(TTFont('Helvetica', os.path.join(script_dir, 'Helvetica.ttf')))
-        pdfmetrics.registerFont(TTFont('NotoEmoji', os.path.join(script_dir, 'NotoEmoji-VariableFont_wght.ttf')))
+        pdfmetrics.registerFont(TTFont('NotoEmoji',os.path.join(script_dir, 'Helvetica.ttf')))
 
         custom_styles.add(ParagraphStyle(name="TOC", fontSize=12, textColor=colors.blue, underline=True, fontName='Helvetica'))
         custom_styles.add(ParagraphStyle(name="FileTree", fontSize=10, leading=12, spaceAfter=6, fontName='Helvetica'))

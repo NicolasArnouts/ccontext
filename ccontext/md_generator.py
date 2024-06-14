@@ -1,33 +1,54 @@
 from ccontext.file_node import FileNode
+from pathlib import Path
 
 class MDGenerator:
-    def __init__(self, output_path):
+    def __init__(self, output_path: str):
         self.output_path = output_path
         self.md_content = []
 
-    def add_section(self, title, content):
-        self.md_content.append(f"### {title}\n")
-        self.md_content.append(content)
-        self.md_content.append("\n")
+    def add_section(self, title: str, content: str = ""):
+        self.md_content.append(f"{title}\n")
+        if content:
+            self.md_content.append(f"{content}\n")
+
+    def add_toc_entry(self, title: str, anchor: str):
+        self.md_content.append(f" - [{title}](#{anchor})\n")
 
     def save_md(self):
         with open(self.output_path, "w") as f:
             f.writelines(self.md_content)
         print(f"Markdown file generated at {self.output_path}")
 
-def generate_md(root_node: FileNode, output_path: str):
-    md_gen = MDGenerator(output_path)
+def generate_md(root_node: FileNode, root_path: str):
+    md_gen = MDGenerator(Path(root_path) / "output.md")
 
-    def add_tree_section(node: FileNode, indent: str = ""):
+    def format_file_tree(node: FileNode, indent: str = "", parent_anchor: str = ""):
         if node.node_type == 'directory':
-            md_gen.add_section(f"{indent}📁 {node.name}", "")
+            anchor = f"{parent_anchor}-{node.name.lower().replace(' ', '-')}"
+            md_gen.add_toc_entry(f"{indent}📁 {node.name}", anchor)
+            md_gen.add_section(f"<a id=\"{anchor}\"></a>", "")
             for child in node.children:
-                add_tree_section(child, indent + "    ")
-        else:
-            md_gen.add_section(f"{indent}📄 {node.tokens} {node.name}", node.content if node.content else "<Binary data>")
+                format_file_tree(child, indent + "    ", anchor)
+        elif node.node_type == 'file':
+            anchor = node.path.lower().replace('/', '-').replace(' ', '-')
+            link = f"[📄 {node.name}](#{anchor})"
+            md_gen.add_toc_entry(f"{indent}📄 {link}", anchor)
+            md_gen.add_section(f"#### 📄 [{node.path}](#{anchor})", f"```\n{node.content if node.content else '<Binary data>'}\n```")
 
-    md_gen.add_section("Directory and File Contents", "")
-    add_tree_section(root_node)
+    def add_file_contents(node: FileNode):
+        if node.node_type == 'file':
+            anchor = node.path.lower().replace('/', '-').replace(' ', '-')
+            md_gen.add_section(f"#### 📄 [{node.path}](#{anchor})", f"```\n{node.content if node.content else '<Binary data>'}\n```")
+        elif node.node_type == 'directory':
+            for child in node.children:
+                add_file_contents(child)
+
+    md_gen.add_section("## [[SYSTEM INSTRUCTIONS]] The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]")
+    md_gen.add_section(f"## Root Path: {root_path}")
+
+    format_file_tree(root_node)
+    md_gen.add_section("#### Detailed File Contents")
+    add_file_contents(root_node)
 
     md_gen.save_md()
 
