@@ -15,7 +15,7 @@ from ccontext.file_system import collect_excludes_includes
 from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
 from ccontext.pdf_generator import generate_pdf
-from ccontext.md_generator import generate_md
+from ccontext.md_generator import generate_md  # Import the new module
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
