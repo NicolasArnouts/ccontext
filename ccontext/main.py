@@ -51,7 +51,8 @@ def load_config(root_path: str, config_path: str = None) -> dict:
             )
             return json.load(f)
 
-    with resources.open_text("ccontext", DEFAULT_CONFIG_FILENAME) as f:
+    # Use the new method with importlib.resources.files
+    with resources.files("ccontext").joinpath(DEFAULT_CONFIG_FILENAME).open("r") as f:
         print(
             f"{Fore.CYAN}Using default config file: {DEFAULT_CONFIG_FILENAME}{Style.RESET_ALL}"
         )
