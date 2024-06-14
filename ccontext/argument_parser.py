@@ -57,11 +57,13 @@ def parse_arguments():
         help="Ignore the .gitignore file for exclusions.",
     )
     parser.add_argument(
+        "-g",
         "--generate-pdf",
         action="store_true",
         help="Generate a PDF of the directory tree and file contents.",
     )
     parser.add_argument(
+        "-gm",
         "--generate-md",
         action="store_true",
         help="Generate a Markdown file of the directory tree and file contents.",
