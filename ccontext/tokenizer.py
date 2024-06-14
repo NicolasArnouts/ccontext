@@ -1,4 +1,7 @@
+# ccontext/tokenizer.py
 import tiktoken
+from typing import List
+from ccontext.file_node import FileNode
 
 def set_model_type_and_buffer(model_type: str, buffer_size: float):
     """
@@ -85,6 +88,50 @@ def chunk_text(file_contents: list, max_tokens: int) -> list:
 
     # Add the final chunk if it contains any content
     if current_chunk.strip():
+        add_chunk()
+
+    return chunks
+
+def chunk_nodes(root_node: FileNode, max_tokens: int) -> List[List[FileNode]]:
+    """
+    Splits the file nodes into chunks that fit within the max_tokens limit.
+
+    Args:
+        root_node (FileNode): The root node of the file tree.
+        max_tokens (int): The maximum number of tokens allowed per chunk.
+
+    Returns:
+        List[List[FileNode]]: A list of lists, each representing a chunk of nodes.
+    """
+    buffer_tokens = int(max_tokens * BUFFER_SIZE)
+    available_tokens = max_tokens - buffer_tokens
+
+    current_chunk = []
+    current_chunk_tokens = 0
+    chunks = []
+
+    def add_chunk():
+        nonlocal current_chunk, current_chunk_tokens
+        if current_chunk:
+            chunks.append(current_chunk)
+        current_chunk = []
+        current_chunk_tokens = 0
+
+    def traverse(node: FileNode):
+        nonlocal current_chunk, current_chunk_tokens
+
+        if node.node_type == 'file':
+            if current_chunk_tokens + node.tokens > available_tokens:
+                add_chunk()
+            current_chunk.append(node)
+            current_chunk_tokens += node.tokens
+        elif node.node_type == 'directory':
+            for child in node.children:
+                traverse(child)
+
+    traverse(root_node)
+
+    if current_chunk:
         add_chunk()
 
     return chunks

@@ -59,27 +59,6 @@ def collect_excludes_includes(
 
     return excludes, includes
 
-# def build_file_tree(root: str, root_path: str, excludes: List[str], includes: List[str], max_tokens: int, indent: str = "") -> list:
-#     """Builds the file structure of the directory tree as an array of objects."""
-#     items = sorted(os.listdir(root))
-#     tree_structure = []
-#     for item in items:
-#         full_path = os.path.join(root, item)
-#         relative_path = os.path.relpath(full_path, start=root_path)
-
-#         if os.path.isdir(full_path):
-#             if is_excluded(relative_path, excludes, includes):
-#                 tree_structure.append({"type": "dir", "name": relative_path, "excluded": True})
-#             else:
-#                 tree_structure.append({"type": "dir", "name": relative_path, "children": build_file_tree(full_path, root_path, excludes, includes, max_tokens, indent + "    ")})
-#         else:
-#             token_length = get_file_token_length(full_path)
-#             if is_excluded(relative_path, excludes, includes):
-#                 tree_structure.append({"type": "file", "name": relative_path, "excluded": True})
-#             else:
-#                 tree_structure.append({"type": "file", "name": relative_path, "tokens": token_length})
-#     return tree_structure
-
 
 def print_tree(
     root: str,

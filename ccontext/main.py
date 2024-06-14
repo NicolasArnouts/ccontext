@@ -16,7 +16,8 @@ from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
 from ccontext.pdf_generator import generate_pdf
 from ccontext.md_generator import generate_md  # Import the new module
-
+from ccontext.file_tree import build_file_tree, format_file_tree, extract_file_contents, sum_file_tokens
+from ccontext.file_node import FileNode
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
 USER_CONFIG_PATH = USER_CONFIG_DIR / DEFAULT_CONFIG_FILENAME
@@ -25,7 +26,6 @@ DEFAULT_CONTEXT_PROMPT = """[[SYSTEM INSTRUCTIONS]]
 The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant.
 [[END SYSTEM INSTRUCTIONS]]"
 """
-
 
 def load_config(root_path: str, config_path: str = None) -> dict:
     """Load configuration from the specified path or use default settings."""
@@ -51,7 +51,6 @@ def load_config(root_path: str, config_path: str = None) -> dict:
             )
             return json.load(f)
 
-    # Use the new method with importlib.resources.files
     with resources.files("ccontext").joinpath(DEFAULT_CONFIG_FILENAME).open("r") as f:
         print(
             f"{Fore.CYAN}Using default config file: {DEFAULT_CONFIG_FILENAME}{Style.RESET_ALL}"
@@ -60,7 +59,6 @@ def load_config(root_path: str, config_path: str = None) -> dict:
 
     print("No configuration file found. Using default settings.")
     return {}
-
 
 def main(
     root_path: str = None,
@@ -71,7 +69,7 @@ def main(
     verbose: bool = False,
     ignore_gitignore: bool = False,
     generate_pdf_flag: bool = False,
-    generate_md_flag: bool = False,  # New argument for generating Markdown
+    generate_md_flag: bool = False,
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
@@ -94,28 +92,23 @@ def main(
     )
     initialize_environment()
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
-    tree_output = print_file_tree(
-        root_path, excludes, includes, max_tokens, for_preview=True
-    )
-    print(tree_output)
-    file_contents_list, total_tokens = gather_file_contents(
-        root_path, excludes, includes
-    )
-    initial_content = combine_initial_content(
-        root_path, excludes, includes, context_prompt, max_tokens
-    )
-
+    
+    # Build file tree once and use it
+    root_node = build_file_tree(root_path, excludes, includes)
+    
+    tree_output = format_file_tree(root_node)
+    
     if generate_pdf_flag:
-        generate_pdf(root_path, tree_output, file_contents_list)
+        generate_pdf(root_path, root_node)
 
     if generate_md_flag:
-        generate_md(root_path, tree_output, file_contents_list)
+        generate_md(root_node, root_path)
 
     if not generate_pdf_flag and not generate_md_flag:
-        handle_chunking_and_output(
-            initial_content, file_contents_list, max_tokens, verbose
-        )
-        
+        file_contents_list = extract_file_contents(root_node)
+        initial_content = combine_initial_content(root_node, root_path, context_prompt, max_tokens)
+        handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
+
 if __name__ == "__main__":
     args = parse_arguments()
     main(
@@ -126,6 +119,6 @@ if __name__ == "__main__":
         args.config,
         args.verbose,
         args.ignore_gitignore,
-        args.generate_pdf,  # Pass the argument for generating PDF
-        args.generate_md,  # Pass the argument for generating Markdown
+        args.generate_pdf,
+        args.generate_md,
     )

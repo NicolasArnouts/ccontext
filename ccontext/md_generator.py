@@ -1,5 +1,4 @@
-import os
-
+from ccontext.file_node import FileNode
 
 class MDGenerator:
     def __init__(self, output_path):
@@ -16,44 +15,35 @@ class MDGenerator:
             f.writelines(self.md_content)
         print(f"Markdown file generated at {self.output_path}")
 
-
-def generate_md(root_path, tree_content, file_contents_list):
-    output_path = os.path.join(root_path, "output.md")
+def generate_md(root_node: FileNode, output_path: str):
     md_gen = MDGenerator(output_path)
 
-    md_gen.add_section("Directory and File Contents", "")
-    md_gen.add_section("File Tree", tree_content)
+    def add_tree_section(node: FileNode, indent: str = ""):
+        if node.node_type == 'directory':
+            md_gen.add_section(f"{indent}📁 {node.name}", "")
+            for child in node.children:
+                add_tree_section(child, indent + "    ")
+        else:
+            md_gen.add_section(f"{indent}📄 {node.tokens} {node.name}", node.content if node.content else "<Binary data>")
 
-    for file_content in file_contents_list:
-        md_gen.add_section("File Content", file_content)
+    md_gen.add_section("Directory and File Contents", "")
+    add_tree_section(root_node)
 
     md_gen.save_md()
 
-
 if __name__ == "__main__":
     import argparse
-    from ccontext.main import load_config, print_file_tree, gather_file_contents
+    from ccontext.main import load_config, build_file_tree
 
-    parser = argparse.ArgumentParser(
-        description="Generate Markdown file of directory tree and file contents."
-    )
-    parser.add_argument(
-        "root_path", type=str, help="The root path of the directory to process."
-    )
-    parser.add_argument(
-        "-c",
-        "--config",
-        type=str,
-        help="Path to a custom configuration file.",
-        default=None,
-    )
+    parser = argparse.ArgumentParser(description="Generate Markdown file of directory tree and file contents.")
+    parser.add_argument("root_path", type=str, help="The root path of the directory to process.")
+    parser.add_argument("-c", "--config", type=str, help="Path to a custom configuration file.", default=None)
     args = parser.parse_args()
 
     config = load_config(args.root_path, args.config)
     excludes, includes = config.get("excluded_folders_files", []), []
     max_tokens = config.get("max_tokens", 32000)
 
-    tree_content = print_file_tree(args.root_path, excludes, includes, max_tokens)
-    file_contents_list, _ = gather_file_contents(args.root_path, excludes, includes)
+    root_node = build_file_tree(args.root_path, excludes, includes)
 
-    generate_md(args.root_path, tree_content, file_contents_list)
+    generate_md(root_node, args.root_path)
