@@ -14,7 +14,6 @@ from reportlab.lib import colors
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from ccontext.file_node import FileNode
-import html  # Import for escaping HTML content
 
 
 class PDFGenerator:
@@ -127,11 +126,21 @@ class PDFGenerator:
                     )
                 )
                 self.story.append(Spacer(1, 0.1 * inch))
-                # Escape HTML content
-                escaped_content = html.escape(node.content).replace("\n", "<br />")
-                self.story.append(
-                    Paragraph(escaped_content, self.custom_styles["FileContent"])
-                )
+                try:
+                    self.story.append(
+                        Paragraph(
+                            self.escape_html(node.content),
+                            self.custom_styles["FileContent"],
+                        )
+                    )
+                except Exception as e:
+                    print(f"Error adding file content for {node.path}: {e}")
+                    self.story.append(
+                        Paragraph(
+                            "<Error reading file content>",
+                            self.custom_styles["FileContent"],
+                        )
+                    )
                 self.story.append(PageBreak())
         elif node.node_type == "directory":
             for child in node.children:
@@ -168,6 +177,10 @@ class PDFGenerator:
         canvas.drawString(inch, 0.75 * inch, f"Page {doc.page}")
         canvas.restoreState()
 
+    def escape_html(self, text):
+        """Escape HTML tags in text to avoid parsing errors."""
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
 
 def generate_pdf(root_path: str, root_node: FileNode):
     output_path = os.path.join(root_path, "output.pdf")
@@ -201,3 +214,4 @@ if __name__ == "__main__":
     root_node = build_file_tree(args.root_path, excludes, includes)
 
     generate_pdf(args.root_path, root_node)
+    
