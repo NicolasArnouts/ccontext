@@ -27,7 +27,8 @@ def handle_chunking_and_output(
             [initial_content] + file_contents_list + [end_marker], max_tokens
         )
 
-        print("CHUNKS: ", chunks)
+        # uncomment to view all chunks, warning: stdout overload
+        # print("CHUNKS: ", chunks)
 
         # Print chunk sizes
         chunk_sizes = [len(tokenize_text(chunk)) for chunk in chunks]

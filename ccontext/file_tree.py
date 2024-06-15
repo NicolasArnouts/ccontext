@@ -5,6 +5,7 @@ from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
 
+# build a root FileNode using recursive path traversal
 def build_file_tree(root_path: str, excludes: List[str], includes: List[str]) -> FileNode:
     def traverse_directory(current_path: str) -> FileNode:
         relative_path = os.path.relpath(current_path, start=root_path)

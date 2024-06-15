@@ -2,6 +2,7 @@ import os
 from typing import List, Tuple
 import pathspec
 from ccontext.tokenizer import tokenize_text
+from colorama import Fore, Style
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:

@@ -96,7 +96,9 @@ def main(
     # Build file tree once and use it
     root_node = build_file_tree(root_path, excludes, includes)
     
+    # always print the file tree in the cli
     tree_output = format_file_tree(root_node)
+    print(tree_output)
     
     if generate_pdf_flag:
         generate_pdf(root_path, root_node)
