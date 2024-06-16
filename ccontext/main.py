@@ -16,8 +16,14 @@ from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
 from ccontext.pdf_generator import generate_pdf
 from ccontext.md_generator import generate_md  # Import the new module
-from ccontext.file_tree import build_file_tree, format_file_tree, extract_file_contents, sum_file_tokens
+from ccontext.file_tree import (
+    build_file_tree,
+    format_file_tree,
+    extract_file_contents,
+    sum_file_tokens,
+)
 from ccontext.file_node import FileNode
+
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
 USER_CONFIG_PATH = USER_CONFIG_DIR / DEFAULT_CONFIG_FILENAME
@@ -26,6 +32,7 @@ DEFAULT_CONTEXT_PROMPT = """[[SYSTEM INSTRUCTIONS]]
 The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant.
 [[END SYSTEM INSTRUCTIONS]]"
 """
+
 
 def load_config(root_path: str, config_path: str = None) -> dict:
     """Load configuration from the specified path or use default settings."""
@@ -60,6 +67,7 @@ def load_config(root_path: str, config_path: str = None) -> dict:
     print("No configuration file found. Using default settings.")
     return {}
 
+
 def main(
     root_path: str = None,
     excludes: list = None,
@@ -92,14 +100,14 @@ def main(
     )
     initialize_environment()
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
-    
+
     # Build file tree once and use it
     root_node = build_file_tree(root_path, excludes, includes)
-    
-    # always print the file tree in the cli
-    tree_output = format_file_tree(root_node)
+
+    # Always print the file tree in the CLI using the new format_file_tree function
+    tree_output = format_file_tree(root_node, max_tokens)
     print(tree_output)
-    
+
     if generate_pdf_flag:
         generate_pdf(root_path, root_node)
 
@@ -108,8 +116,13 @@ def main(
 
     if not generate_pdf_flag and not generate_md_flag:
         file_contents_list = extract_file_contents(root_node)
-        initial_content = combine_initial_content(root_node, root_path, context_prompt, max_tokens)
-        handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
+        initial_content = combine_initial_content(
+            root_node, root_path, context_prompt, max_tokens
+        )
+        handle_chunking_and_output(
+            initial_content, file_contents_list, max_tokens, verbose
+        )
+
 
 if __name__ == "__main__":
     args = parse_arguments()

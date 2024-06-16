@@ -83,6 +83,8 @@ class PDFGenerator:
             onFirstPage=self.add_page_number,
             onLaterPages=self.add_page_number,
         )
+
+        print(f"Total context size: ", root_node.calculate_size())
         print(f"PDF generated at {self.output_path}")
 
     def add_tree_section(self, node: FileNode, indent: str = ""):
@@ -214,4 +216,3 @@ if __name__ == "__main__":
     root_node = build_file_tree(args.root_path, excludes, includes)
 
     generate_pdf(args.root_path, root_node)
-    

@@ -1,8 +1,15 @@
-# ccontext/file_node.py
 from typing import List
 
+
 class FileNode:
-    def __init__(self, name: str, path: str, node_type: str, excludes: List[str], includes: List[str]):
+    def __init__(
+        self,
+        name: str,
+        path: str,
+        node_type: str,
+        excludes: List[str],
+        includes: List[str],
+    ):
         self.name = name
         self.path = path
         self.node_type = node_type  # 'file' or 'directory'
@@ -16,3 +23,13 @@ class FileNode:
     def set_tokens_and_content(self, tokens: int, content: str):
         self.tokens = tokens
         self.content = content
+
+    def calculate_size(self) -> int:
+        """
+        Calculate the total size of the node and its children.
+        Returns the total size in tokens.
+        """
+        total_size = self.tokens
+        for child in self.children:
+            total_size += child.calculate_size()
+        return total_size
