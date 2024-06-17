@@ -4,10 +4,9 @@ from typing import List
 from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
+from ccontext.utils import is_verbose
 
 from colorama import Fore, Style
-
-DEBUG = True
 
 
 # build a root FileNode using recursive path traversal
@@ -44,7 +43,7 @@ def tokenize_file_content(file_path: str) -> (int, str):
             if b"\x00" in header:  # if binary data
                 return 0, ""
             f.seek(0)
-            if DEBUG:
+            if is_verbose():
                 print(file_path)
             contents = f.read().decode("utf-8")
             tokens = tokenize_text(contents)

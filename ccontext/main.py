@@ -4,7 +4,7 @@ from colorama import Fore, Style
 from pathlib import Path
 import importlib.resources as resources
 
-from ccontext.utils import initialize_environment
+from ccontext.utils import initialize_environment, set_verbose
 from ccontext.content_handler import (
     print_file_tree,
     gather_file_contents,
@@ -15,7 +15,7 @@ from ccontext.file_system import collect_excludes_includes
 from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
 from ccontext.pdf_generator import generate_pdf
-from ccontext.md_generator import generate_md  # Import the new module
+from ccontext.md_generator import generate_md
 from ccontext.file_tree import (
     build_file_tree,
     format_file_tree,
@@ -82,6 +82,7 @@ def main(
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
 
+    # start setting values from config
     excludes, includes = collect_excludes_includes(
         config.get("excluded_folders_files", []),
         excludes,
@@ -90,7 +91,10 @@ def main(
         ignore_gitignore,
     )
     max_tokens = max_tokens or int(config.get("max_tokens", 32000))
+
     verbose = verbose or config.get("verbose", False)
+    set_verbose(verbose or config.get("verbose", False))
+
     context_prompt = config.get(
         "context_prompt",
         DEFAULT_CONTEXT_PROMPT,
@@ -98,7 +102,11 @@ def main(
     set_model_type_and_buffer(
         config.get("model_type", "gpt-4o"), config.get("buffer_size", 0.05)
     )
+    # end setting values from config
+
+    # init colorama
     initialize_environment()
+
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
 
     # Build file tree once and use it
