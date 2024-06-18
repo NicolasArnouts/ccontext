@@ -1,4 +1,3 @@
-# ccontext/tokenizer.py
 import tiktoken
 from typing import List
 from ccontext.file_node import FileNode
