@@ -3,4 +3,5 @@ colorama==0.4.6
 pyperclip==1.8.2
 pypdf==4.2.0
 pathspec==0.12.1
-reportlab==4.2.0
+reportlab==4.2.0    
+poetry==1.8.3
