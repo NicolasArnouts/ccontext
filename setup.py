@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ccontext",
-    version="0.2.0",
+    version="0.2.1",
     author="Nicolas Arnouts",
     author_email="arnouts.software@gmail.com",
     description="collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible.",
