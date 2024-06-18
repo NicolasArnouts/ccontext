@@ -15,20 +15,21 @@ def build_file_tree(
     def traverse_directory(current_path: str) -> FileNode:
         relative_path = os.path.relpath(current_path, start=root_path)
         node_type = "directory" if os.path.isdir(current_path) else "file"
+        excluded = is_excluded(relative_path, excludes, includes)
         node = FileNode(
-            os.path.basename(current_path), relative_path, node_type, excludes, includes
+            os.path.basename(current_path),
+            relative_path,
+            node_type,
+            excluded,
         )
 
-        if node_type == "directory":
+        if node_type == "directory" and not excluded:
             for item in sorted(os.listdir(current_path)):
                 full_path = os.path.join(current_path, item)
-                if not is_excluded(full_path, excludes, includes):
-                    child_node = traverse_directory(full_path)
-                    node.add_child(child_node)
-        else:
-            tokens, content = tokenize_file_content(
-                current_path
-            )  # Use current_path instead of full_path
+                child_node = traverse_directory(full_path)
+                node.add_child(child_node)
+        elif node_type == "file" and not excluded:
+            tokens, content = tokenize_file_content(current_path)
             node.set_tokens_and_content(tokens, content)
         return node
 
@@ -68,14 +69,25 @@ def sum_file_tokens(node: FileNode) -> int:
         return sum(sum_file_tokens(child) for child in node.children)
 
 
-def format_file_tree(node: FileNode, max_tokens: int, indent: str = "") -> str:
+def format_file_tree(
+    node: FileNode, max_tokens: int, indent: str = "", useColors: bool = False
+) -> str:
     output = ""
     if node.node_type == "directory":
-        output += f"{indent}📁 {node.name}\n"
-        for child in node.children:
-            output += format_file_tree(child, max_tokens, indent + "    ")
+        if node.excluded:
+            output += f"{indent}[Excluded] 🚫📁 {node.name}\n"
+        else:
+            output += f"{indent}📁 {node.name}\n"
+            for child in node.children:
+                output += format_file_tree(
+                    child, max_tokens, indent + "    ", useColors
+                )
     else:
         percentage = node.tokens / max_tokens if max_tokens else 0
-        color = get_color_for_percentage(percentage)
-        output += f"{indent}📄 {color}{node.tokens}{Style.RESET_ALL} {node.name}\n"
+        color = get_color_for_percentage(percentage) if useColors else ""
+        reset = Style.RESET_ALL if useColors else ""
+        if node.excluded:
+            output += f"{indent}[Excluded] 🚫📄 {node.name}\n"
+        else:
+            output += f"{indent}📄 {color}{node.tokens}{reset} {node.name}\n"
     return output

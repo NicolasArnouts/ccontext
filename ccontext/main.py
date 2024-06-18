@@ -113,7 +113,7 @@ def main(
     root_node = build_file_tree(root_path, excludes, includes)
 
     # Always print the file tree in the CLI using the new format_file_tree function
-    tree_output = format_file_tree(root_node, max_tokens)
+    tree_output = format_file_tree(root_node, max_tokens, useColors=True)
     print(tree_output)
 
     if generate_pdf_flag:
