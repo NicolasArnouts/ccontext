@@ -1,4 +1,3 @@
-# ccontext/file_tree.py
 import os
 from typing import List
 from ccontext.file_node import FileNode
@@ -36,12 +35,12 @@ def build_file_tree(
     return traverse_directory(root_path)
 
 
-def tokenize_file_content(file_path: str) -> (int, str):
+def tokenize_file_content(file_path: str) -> tuple[int, str]:
     try:
         with open(file_path, "rb") as f:
             header = f.read(64)
             if b"\x00" in header:  # if binary data
-                return 0, ""
+                return 0, "Binary data"
             f.seek(0)
             if is_verbose():
                 print(file_path)
