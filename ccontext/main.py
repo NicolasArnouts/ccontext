@@ -4,7 +4,7 @@ from colorama import Fore, Style
 from pathlib import Path
 import importlib.resources as resources
 
-from ccontext.utils import initialize_environment
+from ccontext.utils import initialize_environment, set_verbose
 from ccontext.content_handler import (
     print_file_tree,
     gather_file_contents,
@@ -14,6 +14,15 @@ from ccontext.output_handler import handle_chunking_and_output
 from ccontext.file_system import collect_excludes_includes
 from ccontext.argument_parser import parse_arguments
 from ccontext.tokenizer import set_model_type_and_buffer
+from ccontext.pdf_generator import generate_pdf
+from ccontext.md_generator import generate_md
+from ccontext.file_tree import (
+    build_file_tree,
+    format_file_tree,
+    extract_file_contents,
+    sum_file_tokens,
+)
+from ccontext.file_node import FileNode
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
@@ -49,7 +58,7 @@ def load_config(root_path: str, config_path: str = None) -> dict:
             )
             return json.load(f)
 
-    with resources.open_text("ccontext", DEFAULT_CONFIG_FILENAME) as f:
+    with resources.files("ccontext").joinpath(DEFAULT_CONFIG_FILENAME).open("r") as f:
         print(
             f"{Fore.CYAN}Using default config file: {DEFAULT_CONFIG_FILENAME}{Style.RESET_ALL}"
         )
@@ -67,10 +76,13 @@ def main(
     config_path: str = None,
     verbose: bool = False,
     ignore_gitignore: bool = False,
+    generate_pdf_flag: bool = False,
+    generate_md_flag: bool = False,
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
 
+    # start setting values from config
     excludes, includes = collect_excludes_includes(
         config.get("excluded_folders_files", []),
         excludes,
@@ -79,25 +91,45 @@ def main(
         ignore_gitignore,
     )
     max_tokens = max_tokens or int(config.get("max_tokens", 32000))
+
     verbose = verbose or config.get("verbose", False)
+    set_verbose(verbose or config.get("verbose", False))
+
     context_prompt = config.get(
         "context_prompt",
         DEFAULT_CONTEXT_PROMPT,
     )
-
     set_model_type_and_buffer(
         config.get("model_type", "gpt-4o"), config.get("buffer_size", 0.05)
     )
+    # end setting values from config
+
+    # init colorama
     initialize_environment()
 
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
-    print(print_file_tree(root_path, excludes, includes, for_preview=True))
-    file_contents_list = gather_file_contents(root_path, excludes, includes)
-    initial_content = combine_initial_content(
-        root_path, excludes, includes, context_prompt
-    )
 
-    handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
+    # Build file tree once and use it
+    root_node = build_file_tree(root_path, excludes, includes)
+
+    # Always print the file tree in the CLI using the new format_file_tree function
+    tree_output = format_file_tree(root_node, max_tokens)
+    print(tree_output)
+
+    if generate_pdf_flag:
+        generate_pdf(root_path, root_node)
+
+    if generate_md_flag:
+        generate_md(root_node, root_path)
+
+    if not generate_pdf_flag and not generate_md_flag:
+        file_contents_list = extract_file_contents(root_node)
+        initial_content = combine_initial_content(
+            root_node, root_path, context_prompt, max_tokens
+        )
+        handle_chunking_and_output(
+            initial_content, file_contents_list, max_tokens, verbose
+        )
 
 
 if __name__ == "__main__":
@@ -110,4 +142,6 @@ if __name__ == "__main__":
         args.config,
         args.verbose,
         args.ignore_gitignore,
+        args.generate_pdf,
+        args.generate_md,
     )

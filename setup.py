@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="ccontext",
-    version="0.1.0",
+    version="0.2.0",
     author="Nicolas Arnouts",
     author_email="arnouts.software@gmail.com",
     description="collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible.",
@@ -19,6 +19,8 @@ setup(
         "pyperclip==1.8.2",
         "tiktoken==0.7.0",
         "pathspec==0.12.1",
+        "pypdf==4.2.0",
+        "reportlab==4.2.0",
     ],
     entry_points={
         "console_scripts": [

@@ -1,6 +1,9 @@
 import os
 from typing import List, Tuple
 import pathspec
+from ccontext.tokenizer import tokenize_text
+from ccontext.utils import get_color_for_percentage
+from colorama import Fore, Style
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -19,6 +22,21 @@ def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
         if spec.match_file(include_pattern):
             return False
     return spec.match_file(path)
+
+
+def get_file_token_length(file_path: str) -> int:
+    """Returns the token length of a file."""
+    try:
+        with open(file_path, "rb") as f:
+            header = f.read(64)
+            if b"\x00" in header:  # if binary data
+                return 0
+            f.seek(0)
+            contents = f.read().decode("utf-8")
+            tokens = tokenize_text(contents)
+            return len(tokens)
+    except Exception as e:
+        return -1
 
 
 def collect_excludes_includes(
@@ -49,6 +67,7 @@ def print_tree(
     root_path: str,
     excludes: List[str],
     includes: List[str],
+    max_tokens: int,
     indent: str = "",
 ) -> str:
     """Prints the file structure of the directory tree."""
@@ -64,11 +83,19 @@ def print_tree(
             else:
                 tree_output += f"{indent}📁 {relative_path}\n"
                 tree_output += print_tree(
-                    full_path, root_path, excludes, includes, indent + "    "
+                    full_path,
+                    root_path,
+                    excludes,
+                    includes,
+                    max_tokens,
+                    indent + "    ",
                 )
         else:
+            token_length = get_file_token_length(full_path)
+            percentage = (token_length / max_tokens) * 100
+            color = get_color_for_percentage(percentage)
             if is_excluded(relative_path, excludes, includes):
                 tree_output += f"{indent}[Excluded] 🚫📄 {relative_path}\n"
             else:
-                tree_output += f"{indent}📄 {relative_path}\n"
+                tree_output += f"{indent}📄 {"color:", color} {token_length}{Style.RESET_ALL} {relative_path}\n"
     return tree_output

@@ -5,7 +5,10 @@ from ccontext.clipboard import copy_to_clipboard
 
 
 def handle_chunking_and_output(
-    initial_content: str, file_contents_list: list, max_tokens: int, verbose: bool
+    initial_content: str,
+    file_contents_list: list,
+    max_tokens: int,
+    verbose: bool,
 ):
     """Calculate token length and handle chunking if necessary."""
     end_marker = "### ========== End of Detailed File Contents ==========\n"
@@ -19,14 +22,23 @@ def handle_chunking_and_output(
             f"{Fore.RED}The output exceeds the token limit and will need to be chunked.{Style.RESET_ALL}"
         )
         print(f"\n{token_info}")
+
         chunks = chunk_text(
             [initial_content] + file_contents_list + [end_marker], max_tokens
         )
 
+        # uncomment to view all chunks, warning: stdout overload
+        # print("CHUNKS: ", chunks)
+
+        # Print chunk sizes
+        chunk_sizes = [len(tokenize_text(chunk)) for chunk in chunks]
+        for i, size in enumerate(chunk_sizes):
+            print(f"Chunk {i + 1}: {size} tokens")
+
         for i, chunk in enumerate(chunks):
             chunk_header = f"### Chunk {i + 1} of {len(chunks)}"
             if i == 0:
-                chunk = f"""## Initialization\nThe following content will be delivered in multiple chunks. This is to ensure all data is processed correctly. There will be a total of {len(chunks)} chunks. Thoroughly read the chunk and ONLY reply with 'CHUNK READ, UNDERSTOOD AND REMEMBERING' until you receive the final chunk, this will be marked by '###This is the final chunk.###'. Once you have received the final chunk, reply with 'ACKNOWLEDGING THAT I RECEIVED MY FINAL CHUNK.'\n\n{chunk_header}: File Tree and Initial File Contents\n{chunk}\n###More chunks to follow...###"""
+                chunk = f"""## Initialization\nThe following content will be delivered in multiple chunks. This is to ensure all data is processed correctly. There will be a total of {len(chunks)} chunks. Thoroughly read the chunk and reply with a short summary of the content that was inserted. Until you receive the final chunk, this will be marked by '###This is the final chunk.###', you will have to make a summary of all the summaries that you gave. Once you have received the final chunk, reply with the final summary. '\n\n{chunk_header}: File Tree and Initial File Contents\n{chunk}\n###More chunks to follow...###"""
             elif i == len(chunks) - 1:
                 chunk = f"{chunk_header}\n{chunk}\n###This is the final chunk.###"
             else:
