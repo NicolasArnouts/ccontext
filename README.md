@@ -65,7 +65,7 @@ Output copied to clipboard!
 ccontext is available on PyPI and can be installed using pip:
 
 ```sh
-pip install ccontext
+pipx install ccontext
 ```
 
 ### From Source
@@ -155,7 +155,8 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
     "__tests__",
     "coverage",
     ".next",
-    "pnpm-lock.yaml"
+    "pnpm-lock.yaml",
+    "poetry.lock"
   ],
   "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]"
 }
