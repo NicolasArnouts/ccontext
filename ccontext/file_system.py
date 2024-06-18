@@ -3,6 +3,7 @@ from typing import List, Tuple
 import pathspec
 from ccontext.tokenizer import tokenize_text
 from colorama import Fore, Style
+from utils import get_color_for_percentage
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -59,45 +60,6 @@ def collect_excludes_includes(
         excludes.extend(gitignore_patterns)
 
     return excludes, includes
-
-
-def interpolate_color(percentage, color1, color2):
-    """
-    Interpolates between two RGB colors based on the given percentage.
-    """
-    r = int(color1[0] + (color2[0] - color1[0]) * percentage)
-    g = int(color1[1] + (color2[1] - color1[1]) * percentage)
-    b = int(color1[2] + (color2[2] - color1[2]) * percentage)
-    return (r, g, b)
-
-
-def rgb_to_ansi(r, g, b):
-    """
-    Converts an RGB color to the closest ANSI color code.
-    """
-    if r == 255 and g == 255 and b == 255:
-        return Fore.WHITE
-    elif r == 255 and g == 255 and b == 0:
-        return Fore.YELLOW
-    elif r == 255 and g == 0 and b == 0:
-        return Fore.RED
-    else:
-        return Fore.RESET  # Default to reset if no match is found
-
-
-def get_color_for_percentage(percentage):
-    """
-    Returns a color from white to yellow to red based on the given percentage.
-    """
-    if percentage <= 50:
-        color = interpolate_color(
-            percentage / 50, (255, 255, 255), (255, 255, 0)
-        )  # White to Yellow
-    else:
-        color = interpolate_color(
-            (percentage - 50) / 50, (255, 255, 0), (255, 0, 0)
-        )  # Yellow to Red
-    return rgb_to_ansi(*color)
 
 
 def print_tree(

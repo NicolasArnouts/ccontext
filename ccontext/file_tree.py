@@ -4,7 +4,7 @@ from typing import List
 from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
-from ccontext.utils import is_verbose
+from ccontext.utils import is_verbose, get_color_for_percentage
 
 from colorama import Fore, Style
 
@@ -67,42 +67,6 @@ def sum_file_tokens(node: FileNode) -> int:
         return node.tokens
     else:
         return sum(sum_file_tokens(child) for child in node.children)
-
-
-def interpolate_color(percentage, color1, color2):
-    """
-    Interpolates between two RGB colors based on the given percentage.
-    """
-    r = int(color1[0] + (color2[0] - color1[0]) * percentage)
-    g = int(color1[1] + (color2[1] - color1[1]) * percentage)
-    b = int(color1[2] + (color2[2] - color1[2]) * percentage)
-    return (r, g, b)
-
-
-def rgb_to_ansi(r, g, b):
-    """
-    Converts an RGB color to an ANSI color code.
-    """
-    return f"\033[38;2;{r};{g};{b}m"
-
-
-def get_color_for_percentage(percentage):
-    """
-    Returns a color from white to yellow to orange to red based on the given percentage.
-    """
-    if percentage <= 0.33:
-        color = interpolate_color(
-            percentage / 0.33, (255, 255, 255), (255, 255, 0)
-        )  # White to Yellow
-    elif percentage <= 0.66:
-        color = interpolate_color(
-            (percentage - 0.33) / 0.33, (255, 255, 0), (255, 165, 0)
-        )  # Yellow to Orange
-    else:
-        color = interpolate_color(
-            (percentage - 0.66) / 0.34, (255, 165, 0), (255, 0, 0)
-        )  # Orange to Red
-    return rgb_to_ansi(*color)
 
 
 def format_file_tree(node: FileNode, max_tokens: int, indent: str = "") -> str:
