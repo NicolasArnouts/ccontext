@@ -2,6 +2,7 @@ import subprocess
 import platform
 from colorama import Fore, Style
 import pyperclip
+import os
 
 
 def is_wsl2() -> bool:
@@ -55,6 +56,13 @@ def copy_to_clipboard(text: str):
         if system == "Windows" or system == "Darwin":
             pyperclip.copy(text)
         elif system == "Linux":
+            # Check if running over SSH without X11 forwarding
+            if "SSH_CONNECTION" in os.environ and "DISPLAY" not in os.environ:
+                print(
+                    f"{Fore.YELLOW}SSH connection detected. Please start the SSH connection with -X to enable clipboard functionality:{Style.RESET_ALL}\n"
+                    f"{Fore.YELLOW}ssh -X user@host{Style.RESET_ALL}"
+                )
+
             if (
                 is_wsl2()
             ):  # WSL2 requires utf8clip, https://github.com/asweigart/pyperclip/issues/244
