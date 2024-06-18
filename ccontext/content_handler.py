@@ -11,7 +11,7 @@ def print_file_tree(root_node: FileNode, max_tokens: int) -> str:
     return format_file_tree(root_node, max_tokens)
 
 
-def gather_file_contents(root_node: FileNode, max_tokens: int) -> list:
+def gather_file_contents(root_node: FileNode, max_tokens: int) -> tuple[list, int]:
     return extract_file_contents(root_node), sum_file_tokens(root_node)
 
 

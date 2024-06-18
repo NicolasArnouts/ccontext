@@ -4,8 +4,6 @@ import pathspec
 from ccontext.tokenizer import tokenize_text
 from ccontext.utils import get_color_for_percentage
 from colorama import Fore, Style
-from utils import get_color_for_percentage
-
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
