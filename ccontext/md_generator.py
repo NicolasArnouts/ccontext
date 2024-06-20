@@ -16,6 +16,7 @@ class MDGenerator:
         self.md_content.append(f" - [{title}](#{anchor})\n")
 
     def save_md(self):
+        # Clear the existing file contents before writing new content
         with open(self.output_path, "w") as f:
             f.writelines(self.md_content)
         print(f"Markdown file generated at {self.output_path}")
@@ -44,7 +45,7 @@ class MDGenerator:
         elif node.node_type == "file":
             anchor = node.path.lower().replace("/", "-").replace(" ", "-")
             self.md_content.append(
-                f"{indent}{node.tokens} [📄 {node.name}](#{anchor})\n"
+                f"{indent} [📄 {node.tokens} {node.name}](#{anchor})\n"
             )
 
     def add_file_contents(self, node: FileNode):
@@ -60,7 +61,7 @@ class MDGenerator:
 
 
 def generate_md(root_node: FileNode, root_path: str):
-    output_path = Path(root_path) / "ccontext-output.md"
+    output_path = str(Path(root_path) / "ccontext-output.md")
     md_gen = MDGenerator(output_path)
     md_gen.generate_md(root_node, root_path)
 
