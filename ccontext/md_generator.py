@@ -26,9 +26,9 @@ class MDGenerator:
             "The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]",
         )
         self.add_section(f"## Root Path: {root_path}")
-        self.add_section("## FILE TREE ##\n```")
+        self.add_section("## FILE TREE ##")
         self.format_file_tree(root_node)
-        self.add_section("```\n## END FILE TREE ##")
+        self.add_section("## END FILE TREE ##")
         self.add_section("\n#### Detailed File Contents")
         self.add_file_contents(root_node)
         self.save_md()
@@ -40,15 +40,18 @@ class MDGenerator:
         if node.node_type == "directory":
             self.md_content.append(f"{indent}📁 {node.name}\n")
             for child in node.children:
-                self.format_file_tree(child, indent + "    ", anchor)
+                self.format_file_tree(child, indent + ("-" * 4), anchor)
         elif node.node_type == "file":
-            self.md_content.append(f"{indent}📄 {node.name} - {node.tokens} tokens\n")
+            anchor = node.path.lower().replace("/", "-").replace(" ", "-")
+            self.md_content.append(
+                f"{indent}{node.tokens} [📄 {node.name}](#{anchor})\n"
+            )
 
     def add_file_contents(self, node: FileNode):
         if node.node_type == "file":
             anchor = node.path.lower().replace("/", "-").replace(" ", "-")
             self.add_section(
-                f"##### 📄 [{node.path}](#{anchor}) - {node.tokens} tokens",
+                f'##### 📄 <a id="{anchor}"></a>{node.path} - {node.tokens} tokens',
                 f"```\n{node.content if node.content else '<Binary data>'}\n```",
             )
         elif node.node_type == "directory":
