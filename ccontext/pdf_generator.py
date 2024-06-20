@@ -8,6 +8,7 @@ from reportlab.platypus import (
     Table,
     TableStyle,
     PageBreak,
+    Preformatted,
 )
 from reportlab.lib.units import inch
 from reportlab.lib import colors
@@ -60,7 +61,7 @@ class PDFGenerator:
                 fontSize=10,
                 leading=12,
                 spaceAfter=6,
-                fontName="Helvetica",
+                fontName="Courier",
             )
         )
         custom_styles.add(
@@ -126,17 +127,14 @@ class PDFGenerator:
             if section_anchor:
                 self.story.append(
                     Paragraph(
-                        f'<a name="{section_anchor}"></a>{node.path}',
+                        f'<a name="{section_anchor}"></a>{node.path} - {node.tokens} tokens',
                         self.styles["Heading2"],
                     )
                 )
                 self.story.append(Spacer(1, 0.1 * inch))
                 try:
                     self.story.append(
-                        Paragraph(
-                            self.escape_html(node.content),
-                            self.custom_styles["FileContent"],
-                        )
+                        Preformatted(node.content, self.custom_styles["FileContent"])
                     )
                 except Exception as e:
                     print(f"Error adding file content for {node.path}: {e}")
