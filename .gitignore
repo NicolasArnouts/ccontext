@@ -325,5 +325,5 @@ cython_debug/
 
 
 
-output.md
-output.pdf
+ccontext-output.md
+ccontext-output.pdf
