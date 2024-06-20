@@ -18,10 +18,15 @@ def parse_gitignore(gitignore_path: str) -> List[str]:
 def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
     """Checks if a path should be excluded using pathspec."""
     spec = pathspec.PathSpec.from_lines("gitwildmatch", excludes)
-    for include_pattern in includes:
-        if spec.match_file(include_pattern):
-            return False
+    include_spec = pathspec.PathSpec.from_lines("gitwildmatch", includes)
+    
+    # If the path matches any include pattern, it should not be excluded
+    if include_spec.match_file(path):
+        return False
+    
+    # Otherwise, apply the exclusion patterns
     return spec.match_file(path)
+
 
 
 def get_file_token_length(file_path: str) -> int:

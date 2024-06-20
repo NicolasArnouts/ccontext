@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ccontext"
-version = "0.2.2"
+version = "0.2.3"
 description = "collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible."
 authors = ["Nicolas Arnouts <arnouts.software@gmail.com>"]
 readme = "README.md"
@@ -27,7 +27,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.8,<4"
 colorama = "0.4.6"
-pyperclip = "1.8.2"
+pyperclip = "1.9.0"
 tiktoken = "0.7.0"
 pathspec = "0.12.1"
 pypdf = "4.2.0"

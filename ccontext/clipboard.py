@@ -62,17 +62,7 @@ def copy_to_clipboard(text: str):
                     f"{Fore.YELLOW}SSH connection detected. Please start the SSH connection with -X to enable clipboard functionality:{Style.RESET_ALL}\n"
                     f"{Fore.YELLOW}ssh -X user@host{Style.RESET_ALL}"
                 )
-
-            if (
-                is_wsl2()
-            ):  # WSL2 requires utf8clip, https://github.com/asweigart/pyperclip/issues/244
-                check_and_install_utf8clip()
-                process = subprocess.Popen(
-                    "utf8clip.exe", stdin=subprocess.PIPE, shell=True
-                )
-                process.communicate(text.encode("utf-8"))
-            else:
-                pyperclip.copy(text)
+            pyperclip.copy(text)
         else:
             # Fallback to pyperclip for other systems
             pyperclip.copy(text)
