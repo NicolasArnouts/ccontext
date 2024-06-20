@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ccontext"
-version = "0.2.2"
+version = "0.2.3"
 description = "collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible."
 authors = ["Nicolas Arnouts <arnouts.software@gmail.com>"]
 readme = "README.md"
