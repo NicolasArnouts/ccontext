@@ -33,7 +33,7 @@ class PDFGenerator:
             TTFont("Helvetica", os.path.join(script_dir, "Helvetica.ttf"))
         )
         pdfmetrics.registerFont(
-            TTFont("NotoEmoji", os.path.join(script_dir, "Helvetica.ttf"))
+            TTFont("NotoEmoji", os.path.join(script_dir, "NotoEmoji.ttf"))
         )
 
         custom_styles.add(
@@ -95,9 +95,10 @@ class PDFGenerator:
 
     def format_file_tree(self, node: FileNode, indent: str):
         if node.node_type == "directory":
+            icon = "📁" if not node.excluded else "🚫📁"
             self.story.append(
                 Paragraph(
-                    f"{indent}<font name='NotoEmoji'>📁</font> {node.name}",
+                    f"{indent}<font name='NotoEmoji'>{icon}</font> {node.name}",
                     self.custom_styles["FileTree"],
                 )
             )
@@ -106,9 +107,11 @@ class PDFGenerator:
         else:
             section_anchor = f"section_{len(self.toc)}"
             self.toc.append((node.path, section_anchor))
+
+            icon = "📄" if not node.excluded else "🚫📄"
             self.story.append(
                 Paragraph(
-                    f"{indent}<font name='NotoEmoji'>📄</font> <a href=\"#{section_anchor}\">{node.name}</a>",
+                    f"{indent}<font name='NotoEmoji'>📄</font> {node.tokens} <a href=\"#{section_anchor}\">{node.name}</a>",
                     self.custom_styles["FileTree"],
                 )
             )
@@ -185,7 +188,7 @@ class PDFGenerator:
 
 
 def generate_pdf(root_path: str, root_node: FileNode):
-    output_path = os.path.join(root_path, "output.pdf")
+    output_path = os.path.join(root_path, "ccontext-output.pdf")
     pdf_gen = PDFGenerator(output_path)
     pdf_gen.create_pdf(root_node, root_path)
 

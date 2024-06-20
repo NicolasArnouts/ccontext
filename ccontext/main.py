@@ -82,14 +82,23 @@ def main(
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
 
-    # start setting values from config
+    # Command line arguments have the highest priority
+    cmd_includes = includes or []
+    cmd_excludes = excludes or []
+
+    # Collect excludes and includes, with priority rules applied
+    config_includes = config.get("included_folders_files", [])
+    config_excludes = config.get("excluded_folders_files", [])
+
     excludes, includes = collect_excludes_includes(
-        config.get("excluded_folders_files", []),
-        excludes,
-        includes,
+        config_excludes,
+        cmd_excludes,
+        cmd_includes,
+        config_includes,
         root_path,
         ignore_gitignore,
     )
+
     max_tokens = max_tokens or int(config.get("max_tokens", 32000))
 
     verbose = verbose or config.get("verbose", False)
@@ -102,7 +111,6 @@ def main(
     set_model_type_and_buffer(
         config.get("model_type", "gpt-4o"), config.get("buffer_size", 0.05)
     )
-    # end setting values from config
 
     # init colorama
     initialize_environment()

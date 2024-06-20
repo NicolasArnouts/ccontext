@@ -48,6 +48,7 @@ def collect_excludes_includes(
     default_excludes: List[str],
     additional_excludes: List[str],
     additional_includes: List[str],
+    included_folders_files: List[str],
     root_path: str,
     ignore_gitignore: bool,
 ) -> Tuple[List[str], List[str]]:
@@ -56,9 +57,18 @@ def collect_excludes_includes(
         additional_excludes = additional_excludes.split("|")
     if isinstance(additional_includes, str):
         additional_includes = additional_includes.split("|")
+    if isinstance(included_folders_files, str):
+        included_folders_files = included_folders_files.split("|")
 
-    excludes = default_excludes + (additional_excludes if additional_excludes else [])
-    includes = additional_includes if additional_includes else []
+    # Command line arguments have highest priority
+    includes = additional_includes
+    excludes = additional_excludes
+
+    # Include files from config if not already included via command line
+    includes += [item for item in included_folders_files if item not in includes]
+
+    # Exclude files from config if not already excluded via command line
+    excludes += [item for item in default_excludes if item not in excludes]
 
     if not ignore_gitignore:
         gitignore_patterns = parse_gitignore(os.path.join(root_path, ".gitignore"))
