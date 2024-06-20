@@ -3,6 +3,7 @@ import json
 from colorama import Fore, Style
 from pathlib import Path
 import importlib.resources as resources
+from run_crawlers import run_crawler
 
 from ccontext.utils import initialize_environment, set_verbose
 from ccontext.content_handler import (
@@ -78,6 +79,7 @@ def main(
     ignore_gitignore: bool = False,
     generate_pdf_flag: bool = False,
     generate_md_flag: bool = False,
+    crawl_flag: bool = False,
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
@@ -139,6 +141,12 @@ def main(
             initial_content, file_contents_list, max_tokens, verbose
         )
 
+    if crawl_flag:
+        urls_to_crawl = config.get("urls_to_crawl", [])
+        print("urls_to_crawl", urls_to_crawl)
+        for url_config in urls_to_crawl:
+            run_crawler(url_config)
+
 
 if __name__ == "__main__":
     args = parse_arguments()
@@ -152,4 +160,5 @@ if __name__ == "__main__":
         args.ignore_gitignore,
         args.generate_pdf,
         args.generate_md,
+        args.crawl,
     )

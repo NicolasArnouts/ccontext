@@ -68,6 +68,11 @@ def parse_arguments():
         action="store_true",
         help="Generate a Markdown file of the directory tree and file contents.",
     )
+    parser.add_argument(
+        "--crawl",
+        action="store_true",
+        help="Crawls according to the urls_to_crawl set in the config.json",
+    )
 
     args, unknown = parser.parse_known_args()
     if unknown:
