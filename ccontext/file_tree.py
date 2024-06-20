@@ -7,14 +7,14 @@ from ccontext.tokenizer import tokenize_text
 from ccontext.utils import is_verbose, get_color_for_percentage
 from colorama import Fore, Style
 
-# Record the start time
-start_time = time.time()
-
 
 # build a root FileNode using recursive path traversal
 def build_file_tree(
     root_path: str, excludes: List[str], includes: List[str]
 ) -> FileNode:
+    # Record the start time
+    start_time = time.time()
+
     def traverse_directory(current_path: str) -> FileNode:
         relative_path = os.path.relpath(current_path, start=root_path)
         node_type = "directory" if os.path.isdir(current_path) else "file"
