@@ -185,7 +185,7 @@ class PDFGenerator:
 
 
 def generate_pdf(root_path: str, root_node: FileNode):
-    output_path = os.path.join(root_path, "output.pdf")
+    output_path = os.path.join(root_path, "ccontext-output.pdf")
     pdf_gen = PDFGenerator(output_path)
     pdf_gen.create_pdf(root_node, root_path)
 

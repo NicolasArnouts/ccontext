@@ -20,7 +20,7 @@ class MDGenerator:
         print(f"Markdown file generated at {self.output_path}")
 
 def generate_md(root_node: FileNode, root_path: str):
-    md_gen = MDGenerator(Path(root_path) / "output.md")
+    md_gen = MDGenerator(Path(root_path) / "ccontext-output.md")
 
     def format_file_tree(node: FileNode, indent: str = "", parent_anchor: str = ""):
         if node.node_type == 'directory':
