@@ -12,4 +12,6 @@ def main():
         config_path=args.config,
         verbose=args.verbose,
         ignore_gitignore=args.ignore_gitignore,
+        generate_pdf_flag=args.generate_pdf,
+        generate_md_flag=args.generate_md,
     )
