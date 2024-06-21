@@ -10,8 +10,9 @@
 - 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
 - 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📄 **Markdown and PDF Generation**: Generate detailed Markdown and PDF files of the directory structure and file contents.
+- 🌐 **Crawling of Software Documentation Sites by a List of URLs**: Crawl and gather data from multiple software documentation sites using a specified list of URLs.
 - 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
-- 🌐 **Crawling of Software Documentation Sites by a List of URLs** (Upcoming): Crawl and gather data from multiple software documentation sites using a specified list of URLs.
+
 
 ## Example output:
 ```sh
@@ -124,6 +125,8 @@ pipx install ccontext
 - `-ig, --ignore_gitignore`: Ignore the `.gitignore` file for exclusions.
 - `-g, --generate-pdf`: Generate a PDF of the directory tree and file contents.
 - `-gm, --generate-md`: Generate a Markdown file of the directory tree and file contents.
+- `--crawl`: Crawls the sites specified in the config
+ 
 
 ### Example
 
@@ -139,10 +142,10 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
 
 ```json
 {
-  "verbose": false,
-  "max_tokens": 32000,
-  "model_type": "gpt-4o",
-  "buffer_size": 0.05,
+  "verbose": false, // prints more data on the screen
+  "max_tokens": 32000, // max token size of input prompt / maximum size of the chunks
+  "model_type": "gpt-4o", // sets tiktoken.encoding_for_model()
+  "buffer_size": 0.05, // a buffer for max_tokens that limits how full the chunks can be
   "excluded_folders_files": [
     ".git",
     "bin",
@@ -157,9 +160,31 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
     "coverage",
     ".next",
     "pnpm-lock.yaml",
-    "poetry.lock"
+    "poetry.lock",
+    "ccontext-output.pdf",
+    "ccontext-output.md",
+    ".phpstorm.meta.php",
+    "*.min.js",
+    "composer.lock",
+    "*.lock",
+    "vendor",
+    "laravel_access.log"
   ],
-  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]"
+  "included_folders_files": [],
+  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]",
+  "urls_to_crawl": [
+    {
+      "url": "https://www.django-rest-framework.org/",
+      "match": [
+        "https://www.django-rest-framework.org/api-guide/**",
+        "https://www.django-rest-framework.org/tutorial/**"
+      ],
+      "resourceExclusions": ["https://www.django-rest-framework.org/community/**"],
+      "maxPagesToCrawl": 100,
+      "outputFileName": "django-rest-framework.org.json",
+      "maxTokens": 2000000
+    },
+  ]
 }
 ```
 
