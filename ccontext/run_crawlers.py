@@ -13,21 +13,18 @@ def load_config_data(config_file):
         return json.load(file)
 
 
-# Function to run the crawler for a given configuration
-def run_crawler(config):
-    configJson = json.dumps(config, indent=2)
-    print(f"{Fore.GREEN}Now fetching {Style.RESET_ALL}", config["url"])
-    print(configJson)
-    print('config["resourceExclusions"]', config.get("resourceExclusions"))
+# Function to write the gpt-crawler/config.ts file
+def write_config_ts(config):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_file_path = os.path.join(script_dir, "gpt-crawler", "config.ts")
+    resourceExclusionsList = config.get("resourceExclusions")
     resource_exclusions_string = (
-        f"resourceExclusions: {config['resourceExclusions']}"
-        if config.get("resourceExclusions") is not None
+        f"resourceExclusions: {resourceExclusionsList}"
+        if resourceExclusionsList is not None
         else ""
     )
-    try:
-        # Write the config to config.ts
-        with open("gpt-crawler/config.ts", "w") as config_file:
-            config_content = f"""
+
+    config_content = f"""
 import {{ Config }} from "./src/config";
 
 export const defaultConfig: Config = {{
@@ -36,52 +33,92 @@ export const defaultConfig: Config = {{
   maxPagesToCrawl: {config['maxPagesToCrawl']},
   outputFileName: "{config['outputFileName']}",
   maxTokens: {config['maxTokens']},
- {resource_exclusions_string}
+  {resource_exclusions_string},
 }};
 """
-            config_file.write(config_content)
 
-        # Run the crawler with Popen to stream the output
-        process = subprocess.Popen(
-            ["npm", "start"],
-            cwd="gpt-crawler",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+    with open(config_file_path, "w") as config_file:
+        config_file.write(config_content)
+        # print(f"{Fore.GREEN}Config written to {config_file_path}{Style.RESET_ALL}")
 
-        # Stream the output to stdout
-        while True:
-            output = process.stdout.readline()
-            if output == "" and process.poll() is not None:
-                break
-            if output:
-                print(output.strip())
 
-        # Stream the error to stdout
-        while True:
-            error = process.stderr.readline()
-            if error == "" and process.poll() is not None:
-                break
-            if error:
-                print(f"{Fore.RED}{error.strip()}{Style.RESET_ALL}")
+# Function to run npm start command
+def run_npm_start():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    gpt_crawler_dir = os.path.join(script_dir, "gpt-crawler")
 
-        # Wait for the subprocess to finish
-        process.wait()
-
-        # Check for errors
-        if process.returncode != 0:
-            print(
-                f"{Fore.RED}Error running crawler for URL {config['url']}{Style.RESET_ALL}"
-            )
-        else:
-            print(
-                f"{Fore.GREEN}Successfully ran crawler for URL {config['url']}{Style.RESET_ALL}"
-            )
-
-    except Exception as e:
+    if not os.path.exists(gpt_crawler_dir):
         print(
-            f"Exception occurred while running crawler for URL {config['url']}: {str(e)}"
+            f"{Fore.RED}gpt-crawler directory not found at {gpt_crawler_dir}{Style.RESET_ALL}"
+        )
+        check_and_install_gpt_crawler()
+        return False
+
+    process = subprocess.Popen(
+        ["npm", "start"],
+        cwd=gpt_crawler_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    # Stream the output to stdout
+    while True:
+        output = process.stdout.readline()
+        if output == "" and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+
+    # Stream the error to stdout
+    while True:
+        error = process.stderr.readline()
+        if error == "" and process.poll() is not None:
+            break
+        if error:
+            print(f"{Fore.RED}{error.strip()}{Style.RESET_ALL}")
+
+    # Wait for the subprocess to finish
+    process.wait()
+
+    # Check for errors
+    if process.returncode != 0:
+        return False
+    return True
+
+
+# Function to check if gpt-crawler is installed and install if necessary
+def check_and_install_gpt_crawler():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    gpt_crawler_dir = os.path.join(script_dir, "gpt-crawler")
+
+    if not Path(gpt_crawler_dir).exists():
+        print(f"{Fore.CYAN}gpt-crawler not installed, installing now...{Style.RESET_ALL}")
+        os.chdir(script_dir)
+
+        print(f"{Fore.CYAN}Cloning gpt-crawler repository...{Style.RESET_ALL}")
+        subprocess.run(["git", "clone", "https://github.com/builderio/gpt-crawler"])
+
+        os.chdir("gpt-crawler")
+
+        print(f"{Fore.CYAN}Installing npm dependencies...{Style.RESET_ALL}")
+        subprocess.run(["npm", "install"])
+
+
+# Function to run the crawler for a given configuration
+def run_crawler(config):
+    check_and_install_gpt_crawler()
+    write_config_ts(config)
+
+    print(f"{Fore.GREEN}Now fetching {Style.RESET_ALL} {config['url']}")
+
+    if run_npm_start():
+        print(
+            f"{Fore.GREEN}Successfully ran crawler for URL {config['url']}{Style.RESET_ALL}"
+        )
+    else:
+        print(
+            f"{Fore.RED}Error running crawler for URL {config['url']}{Style.RESET_ALL}"
         )
 
 
@@ -100,15 +137,7 @@ def main():
         print("Crawling is disabled. Exiting.")
         return
 
-    # Clone the repository if not already cloned
-    if not Path("gpt-crawler").exists():
-        subprocess.run(["git", "clone", "https://github.com/builderio/gpt-crawler"])
-
-    # Change to the repository directory
-    os.chdir("gpt-crawler")
-
-    # Install npm dependencies
-    subprocess.run(["npm", "install"])
+    check_and_install_gpt_crawler()
 
     # Load the config data
     config_data = load_config_data(
