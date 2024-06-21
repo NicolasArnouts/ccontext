@@ -143,7 +143,7 @@ def main(
 
     if crawl_flag:
         urls_to_crawl = config.get("urls_to_crawl", [])
-        print("urls_to_crawl", urls_to_crawl)
+        #print("urls_to_crawl", urls_to_crawl)
         for url_config in urls_to_crawl:
             run_crawler(url_config)
 

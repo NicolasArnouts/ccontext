@@ -4,6 +4,7 @@ import json
 import threading
 from pathlib import Path
 import argparse
+from colorama import Fore, Style
 
 
 # Load configuration data from config.json
@@ -14,25 +15,69 @@ def load_config_data(config_file):
 
 # Function to run the crawler for a given configuration
 def run_crawler(config):
+    configJson = json.dumps(config, indent=2)
+    print(f"{Fore.GREEN}Now fetching {Style.RESET_ALL}", config["url"])
+    print(configJson)
+    print('config["resourceExclusions"]', config.get("resourceExclusions"))
+    resource_exclusions_string = (
+        f"resourceExclusions: {config['resourceExclusions']}"
+        if config.get("resourceExclusions") is not None
+        else ""
+    )
     try:
         # Write the config to config.ts
-        with open("config.ts", "w") as config_file:
+        with open("gpt-crawler/config.ts", "w") as config_file:
             config_content = f"""
 import {{ Config }} from "./src/config";
 
-export const defaultConfig: Config = {json.dumps(config, indent=2)};
+export const defaultConfig: Config = {{
+  url: "{config['url']}",
+  match: {json.dumps(config['match'], indent=2)},
+  maxPagesToCrawl: {config['maxPagesToCrawl']},
+  outputFileName: "{config['outputFileName']}",
+  maxTokens: {config['maxTokens']},
+ {resource_exclusions_string}
+}};
 """
             config_file.write(config_content)
 
-        # Run the crawler
-        result = subprocess.run(["npm", "start"], capture_output=True, text=True)
+        # Run the crawler with Popen to stream the output
+        process = subprocess.Popen(
+            ["npm", "start"],
+            cwd="gpt-crawler",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+        # Stream the output to stdout
+        while True:
+            output = process.stdout.readline()
+            if output == "" and process.poll() is not None:
+                break
+            if output:
+                print(output.strip())
+
+        # Stream the error to stdout
+        while True:
+            error = process.stderr.readline()
+            if error == "" and process.poll() is not None:
+                break
+            if error:
+                print(f"{Fore.RED}{error.strip()}{Style.RESET_ALL}")
+
+        # Wait for the subprocess to finish
+        process.wait()
 
         # Check for errors
-        if result.returncode != 0:
-            print(f"Error running crawler for URL {config['url']}: {result.stderr}")
+        if process.returncode != 0:
+            print(
+                f"{Fore.RED}Error running crawler for URL {config['url']}{Style.RESET_ALL}"
+            )
         else:
-            print(f"Successfully ran crawler for URL {config['url']}")
-            print(result.stdout)
+            print(
+                f"{Fore.GREEN}Successfully ran crawler for URL {config['url']}{Style.RESET_ALL}"
+            )
 
     except Exception as e:
         print(

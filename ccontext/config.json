@@ -34,38 +34,30 @@
       "url": "https://www.django-rest-framework.org/",
       "match": [
         "https://www.django-rest-framework.org/api-guide/**",
-        "https://www.django-rest-framework.org/tutorial/**",
-        "https://www.django-rest-framework.org/**"
+        "https://www.django-rest-framework.org/tutorial/**"
       ],
+      "resourceExclusions": ["https://www.django-rest-framework.org/community/**"],
       "maxPagesToCrawl": 100,
       "outputFileName": "django-rest-framework.org.json",
       "maxTokens": 2000000
     },
     {
-      "url": "https://docs.djangoproject.com/en/stable/",
+      "url": "https://docs.djangoproject.com/en/5.0/",
       "match": [
-        "https://docs.djangoproject.com/en/stable/**"
+        "https://docs.djangoproject.com/en/5.0/**"
       ],
+
       "maxPagesToCrawl": 100,
       "outputFileName": "docs.djangoproject.json",
       "maxTokens": 2000000
     },
     {
-      "url": "https://reactjs.org/docs/getting-started.html",
+      "url": "https://nextjs.org/docs",
       "match": [
-        "https://reactjs.org/docs/**"
+        "https://nextjs.org/docs/**"
       ],
       "maxPagesToCrawl": 100,
       "outputFileName": "reactjs.docs.json",
-      "maxTokens": 2000000
-    },
-    {
-      "url": "https://vuejs.org/v2/guide/",
-      "match": [
-        "https://vuejs.org/v2/guide/**"
-      ],
-      "maxPagesToCrawl": 100,
-      "outputFileName": "vue_js.json",
       "maxTokens": 2000000
     }
   ]
