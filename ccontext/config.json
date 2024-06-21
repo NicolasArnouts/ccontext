@@ -12,15 +12,54 @@
     "__pycache__",
     "package-lock.json",
     "ccontext.egg-info",
-    "dist/",
+    "dist",
     "__tests__",
     "coverage",
     ".next",
     "pnpm-lock.yaml",
     "poetry.lock",
     "ccontext-output.pdf",
-    "ccontext-output.md"
+    "ccontext-output.md",
+    ".phpstorm.meta.php",
+    "*.min.js",
+    "composer.lock",
+    "*.lock",
+    "vendor",
+    "laravel_access.log"
   ],
   "included_folders_files": [],
-  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]"
+  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]",
+  "urls_to_crawl": [
+    {
+      "url": "https://www.django-rest-framework.org/",
+      "match": [
+        "https://www.django-rest-framework.org/api-guide/**",
+        "https://www.django-rest-framework.org/tutorial/**"
+      ],
+      "resourceExclusions": ["https://www.django-rest-framework.org/community/**"],
+      "maxPagesToCrawl": 100,
+      "outputFileName": "django-rest-framework.org.json",
+      "maxTokens": 2000000
+    },
+    {
+      "url": "https://docs.djangoproject.com/en/5.0/",
+      "match": [
+        "https://docs.djangoproject.com/en/5.0/**"
+      ],
+
+      "maxPagesToCrawl": 100,
+      "outputFileName": "docs.djangoproject.json",
+      "maxTokens": 2000000
+    },
+    {
+      "url": "https://nextjs.org/docs",
+      "match": [
+        "https://nextjs.org/docs/**"
+      ],
+      "maxPagesToCrawl": 100,
+      "outputFileName": "reactjs.docs.json",
+      "maxTokens": 2000000
+    }
+  ]
 }
+

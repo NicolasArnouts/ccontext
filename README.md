@@ -11,6 +11,7 @@
 - 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📄 **Markdown and PDF Generation**: Generate detailed Markdown and PDF files of the directory structure and file contents.
 - 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
+- 🌐 **Crawling of Software Documentation Sites by a List of URLs** (Upcoming): Crawl and gather data from multiple software documentation sites using a specified list of URLs.
 
 ## Example output:
 ```sh
