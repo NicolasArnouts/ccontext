@@ -33,33 +33,15 @@
     {
       "url": "https://www.django-rest-framework.org/",
       "match": [
-        "https://www.django-rest-framework.org/api-guide/**",
-        "https://www.django-rest-framework.org/tutorial/**"
+        "https://www.django-rest-framework.org/**"
       ],
-      "resourceExclusions": ["https://www.django-rest-framework.org/community/**"],
+      "exclude": [
+        "https://www.django-rest-framework.org/community/**"
+      ],
+      "selector": "",
       "maxPagesToCrawl": 100,
       "outputFileName": "django-rest-framework.org.json",
-      "maxTokens": 2000000
-    },
-    {
-      "url": "https://docs.djangoproject.com/en/5.0/",
-      "match": [
-        "https://docs.djangoproject.com/en/5.0/**"
-      ],
-
-      "maxPagesToCrawl": 100,
-      "outputFileName": "docs.djangoproject.json",
-      "maxTokens": 2000000
-    },
-    {
-      "url": "https://nextjs.org/docs",
-      "match": [
-        "https://nextjs.org/docs/**"
-      ],
-      "maxPagesToCrawl": 100,
-      "outputFileName": "reactjs.docs.json",
       "maxTokens": 2000000
     }
   ]
 }
-

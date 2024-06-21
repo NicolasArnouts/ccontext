@@ -10,7 +10,7 @@
 - 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
 - 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📄 **Markdown and PDF Generation**: Generate detailed Markdown and PDF files of the directory structure and file contents.
-- 🌐 **Crawling of Software Documentation Sites by a List of URLs**: Crawl and gather data from multiple software documentation sites using a specified list of URLs.
+- 🌐 **Crawling of (documentation) Sites**: Crawl and gather data from multiple sites using a specified list of URLs.
 - 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
 
 
@@ -176,14 +176,16 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
     {
       "url": "https://www.django-rest-framework.org/",
       "match": [
-        "https://www.django-rest-framework.org/api-guide/**",
-        "https://www.django-rest-framework.org/tutorial/**"
+        "https://www.django-rest-framework.org/**"
       ],
-      "resourceExclusions": ["https://www.django-rest-framework.org/community/**"],
+      "exclude": [
+        "https://www.django-rest-framework.org/community/**"
+      ],
+      "selector": "",
       "maxPagesToCrawl": 100,
       "outputFileName": "django-rest-framework.org.json",
       "maxTokens": 2000000
-    },
+    }
   ]
 }
 ```
@@ -191,7 +193,8 @@ You can customize the behavior of `ccontext` by creating a configuration file. T
 ## Use Cases
 
 - **Codebase Context**: Send the entire codebase as context to an LLM in one go, avoiding the need to copy and paste snippets manually.
-- **Document Generation**: Generate detailed Markdown and PDF files of your directory structure and file contents, to easily RAG upon.
+- **Document Generation**: Generate detailed Markdown and PDF files of your directory structure and file contents, to easily RAG upon.]
+- **Documentation crawling**: crawl any (documentation) site there is, and use it for sending context
 
 ## Contributing
 

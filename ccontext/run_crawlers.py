@@ -17,12 +17,12 @@ def load_config_data(config_file):
 def write_config_ts(config):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_file_path = os.path.join(script_dir, "gpt-crawler", "config.ts")
-    resourceExclusionsList = config.get("resourceExclusions")
-    resource_exclusions_string = (
-        f"resourceExclusions: {resourceExclusionsList}"
-        if resourceExclusionsList is not None
-        else ""
-    )
+
+    exclude = config.get("exclude")
+    excludes_string = f"exclude: {exclude}" if exclude is not None else ""
+
+    # Get the CWD where the script is executed
+    output_path = os.path.join(os.getcwd(), config["outputFileName"])
 
     config_content = f"""
 import {{ Config }} from "./src/config";
@@ -31,15 +31,15 @@ export const defaultConfig: Config = {{
   url: "{config['url']}",
   match: {json.dumps(config['match'], indent=2)},
   maxPagesToCrawl: {config['maxPagesToCrawl']},
-  outputFileName: "{config['outputFileName']}",
+  outputFileName: "{output_path}",
   maxTokens: {config['maxTokens']},
-  {resource_exclusions_string},
+  {excludes_string}
 }};
 """
 
     with open(config_file_path, "w") as config_file:
         config_file.write(config_content)
-        # print(f"{Fore.GREEN}Config written to {config_file_path}{Style.RESET_ALL}")
+        #print(f"{Fore.GREEN}Config written to {config_file_path}{Style.RESET_ALL}")
 
 
 # Function to run npm start command
@@ -93,7 +93,9 @@ def check_and_install_gpt_crawler():
     gpt_crawler_dir = os.path.join(script_dir, "gpt-crawler")
 
     if not Path(gpt_crawler_dir).exists():
-        print(f"{Fore.CYAN}gpt-crawler not installed, installing now...{Style.RESET_ALL}")
+        print(
+            f"{Fore.CYAN}gpt-crawler not installed, installing now...{Style.RESET_ALL}"
+        )
         os.chdir(script_dir)
 
         print(f"{Fore.CYAN}Cloning gpt-crawler repository...{Style.RESET_ALL}")
