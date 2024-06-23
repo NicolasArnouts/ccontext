@@ -3,12 +3,10 @@ import json
 from colorama import Fore, Style
 from pathlib import Path
 import importlib.resources as resources
-from run_crawlers import run_crawler
 
+from ccontext.run_crawlers import run_crawler
 from ccontext.utils import initialize_environment, set_verbose
 from ccontext.content_handler import (
-    print_file_tree,
-    gather_file_contents,
     combine_initial_content,
 )
 from ccontext.output_handler import handle_chunking_and_output
@@ -21,9 +19,7 @@ from ccontext.file_tree import (
     build_file_tree,
     format_file_tree,
     extract_file_contents,
-    sum_file_tokens,
 )
-from ccontext.file_node import FileNode
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
@@ -143,7 +139,7 @@ def main(
 
     if crawl_flag:
         urls_to_crawl = config.get("urls_to_crawl", [])
-        #print("urls_to_crawl", urls_to_crawl)
+        # print("urls_to_crawl", urls_to_crawl)
         for url_config in urls_to_crawl:
             run_crawler(url_config)
 

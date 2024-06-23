@@ -324,6 +324,7 @@ cython_debug/
 
 
 
+ccontext/gpt-crawler/
 
 ccontext-output.md
 ccontext-output.pdf
