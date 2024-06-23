@@ -75,7 +75,7 @@ def main(
     ignore_gitignore: bool = False,
     generate_pdf_flag: bool = False,
     generate_md_flag: bool = False,
-    crawl_flag: bool = False,
+    crawl: bool = False,
 ):
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
@@ -137,7 +137,7 @@ def main(
             initial_content, file_contents_list, max_tokens, verbose
         )
 
-    if crawl_flag:
+    if crawl:
         urls_to_crawl = config.get("urls_to_crawl", [])
         # print("urls_to_crawl", urls_to_crawl)
         for url_config in urls_to_crawl:
