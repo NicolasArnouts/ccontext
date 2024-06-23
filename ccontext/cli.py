@@ -14,5 +14,5 @@ def main():
         ignore_gitignore=args.ignore_gitignore,
         generate_pdf_flag=args.generate_pdf,
         generate_md_flag=args.generate_md,
-        crawl_flag=args.crawl_flag,
+        crawl=args.crawl,
     )
