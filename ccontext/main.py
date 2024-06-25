@@ -109,11 +109,20 @@ def main(
     set_model_type_and_buffer(
         config.get("model_type", "gpt-4o"), config.get("buffer_size", 0.05)
     )
+    # END CONFIG LOGIC
 
+    # START MAIN LOGIC
     # init colorama
     initialize_environment()
 
     print(f"{Fore.CYAN}Root Path: {root_path}\n{Style.RESET_ALL}")
+
+    # crawling should happen before tree building
+    if crawl:
+        urls_to_crawl = config.get("urls_to_crawl", [])
+        # print("urls_to_crawl", urls_to_crawl)
+        for url_config in urls_to_crawl:
+            run_crawler(url_config)
 
     # Build file tree once and use it
     root_node = build_file_tree(root_path, excludes, includes)
@@ -136,12 +145,6 @@ def main(
         handle_chunking_and_output(
             initial_content, file_contents_list, max_tokens, verbose
         )
-
-    if crawl:
-        urls_to_crawl = config.get("urls_to_crawl", [])
-        # print("urls_to_crawl", urls_to_crawl)
-        for url_config in urls_to_crawl:
-            run_crawler(url_config)
 
 
 if __name__ == "__main__":
