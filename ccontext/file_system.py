@@ -19,14 +19,13 @@ def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
     """Checks if a path should be excluded using pathspec."""
     spec = pathspec.PathSpec.from_lines("gitwildmatch", excludes)
     include_spec = pathspec.PathSpec.from_lines("gitwildmatch", includes)
-    
+
     # If the path matches any include pattern, it should not be excluded
     if include_spec.match_file(path):
         return False
-    
+
     # Otherwise, apply the exclusion patterns
     return spec.match_file(path)
-
 
 
 def get_file_token_length(file_path: str) -> int:
@@ -112,5 +111,5 @@ def print_tree(
             if is_excluded(relative_path, excludes, includes):
                 tree_output += f"{indent}[Excluded] 🚫📄 {relative_path}\n"
             else:
-                tree_output += f"{indent}📄 {"color:", color} {token_length}{Style.RESET_ALL} {relative_path}\n"
+                tree_output += f"{indent}📄 {color} {token_length}{Style.RESET_ALL} {relative_path}\n"
     return tree_output
