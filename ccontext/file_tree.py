@@ -1,6 +1,6 @@
 import os
 import time
-from typing import List
+from typing import List, Tuple
 from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
@@ -46,7 +46,7 @@ def build_file_tree(
     return traverse_directory(root_path)
 
 
-def tokenize_file_content(file_path: str) -> tuple[int, str]:
+def tokenize_file_content(file_path: str) -> Tuple[int, str]:
     try:
         with open(file_path, "rb") as f:
             header = f.read(64)
