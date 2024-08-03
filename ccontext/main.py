@@ -20,13 +20,15 @@ from ccontext.file_tree import (
     format_file_tree,
     extract_file_contents,
 )
+from ccontext.configurator import copy_default_config
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
 USER_CONFIG_PATH = USER_CONFIG_DIR / DEFAULT_CONFIG_FILENAME
 CURRENT_CONFIG_FILENAME = ".conti-config.json"
-DEFAULT_CONTEXT_PROMPT = """[[SYSTEM INSTRUCTIONS]]
-The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant.
+DEFAULT_CONTEXT_PROMPT = """
+[[SYSTEM INSTRUCTIONS]]
+The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. Always give full code file contents and the relative file paths of the files where you change code. Clearly explain what steps you are going to undertake, then proceed action and complete them one by one. Think ahead.
 [[END SYSTEM INSTRUCTIONS]]"
 """
 
@@ -48,21 +50,13 @@ def load_config(root_path: str, config_path: str = None) -> dict:
             )
             return json.load(f)
 
-    if USER_CONFIG_PATH.exists():
-        with open(USER_CONFIG_PATH, "r") as f:
-            print(
-                f"{Fore.CYAN}Using user config file: {USER_CONFIG_PATH}{Style.RESET_ALL}"
-            )
-            return json.load(f)
+    if not USER_CONFIG_PATH.exists():
+        print(f"{USER_CONFIG_PATH} does not exist yet, creating one")
+        copy_default_config()
 
-    with resources.files("ccontext").joinpath(DEFAULT_CONFIG_FILENAME).open("r") as f:
-        print(
-            f"{Fore.CYAN}Using default config file: {DEFAULT_CONFIG_FILENAME}{Style.RESET_ALL}"
-        )
+    with open(USER_CONFIG_PATH, "r") as f:
+        print(f"{Fore.CYAN}Using user config file: {USER_CONFIG_PATH}{Style.RESET_ALL}")
         return json.load(f)
-
-    print("No configuration file found. Using default settings.")
-    return {}
 
 
 def main(
