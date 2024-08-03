@@ -26,6 +26,8 @@ def copy_default_config():
             else:
                 print(f"Config file already exists at {USER_CONFIG_PATH}")
 
+        return USER_CONFIG_PATH
+
     except Exception as e:
         print(f"Error copying default config: {e}")
 
