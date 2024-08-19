@@ -6,9 +6,10 @@ from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
 from ccontext.utils import is_verbose, get_color_for_percentage
 from colorama import Fore, Style
+from wcmatch import glob
+from pypdf import PdfReader
+import io
 
-
-# build a root FileNode using recursive path traversal
 def build_file_tree(
     root_path: str, excludes: List[str], includes: List[str]
 ) -> FileNode:
@@ -45,22 +46,57 @@ def build_file_tree(
 
     return traverse_directory(root_path)
 
+def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
+    """Checks if a path should be excluded using wcmatch."""
+    # If the path matches any include pattern, it should not be excluded
+    if any(glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in includes):
+        return False
+
+    # Otherwise, apply the exclusion patterns
+    return any(
+        glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in excludes
+    )
 
 def tokenize_file_content(file_path: str) -> Tuple[int, str]:
     try:
+        if file_path.lower().endswith('.pdf'):
+            return extract_pdf_content(file_path)
+        
         with open(file_path, "rb") as f:
-            header = f.read(64)
-            if b"\x00" in header:  # if binary data
-                return 0, "Binary data"
-            f.seek(0)
-            if is_verbose():
-                print(file_path)
-            contents = f.read().decode("utf-8")
-            tokens = tokenize_text(contents)
-            return len(tokens), contents
+            content = f.read()
+            
+        if b'\x00' in content[:1024]:  # Check if file is binary
+            return 0, "Binary data"
+        
+        try:
+            text_content = content.decode('utf-8')
+        except UnicodeDecodeError:
+            text_content = content.decode('latin-1')  # Fallback encoding
+        
+        if is_verbose():
+            print(file_path)
+        
+        tokens = tokenize_text(text_content)
+        return len(tokens), text_content
     except Exception as e:
-        return 0, f"Error reading file {file_path}: {e}"
+        return 0, f"Error reading file {file_path}: {str(e)}"
 
+def extract_pdf_content(file_path: str) -> Tuple[int, str]:
+    try:
+        with open(file_path, 'rb') as file:
+            pdf_reader = PdfReader(file)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text() + "\n\n"
+        
+        if is_verbose():
+            print(f"Processing PDF: {file_path}")
+        
+        clean_text = text.strip()
+        tokens = tokenize_text(clean_text)
+        return len(tokens), clean_text
+    except Exception as e:
+        return 0, f"Error reading PDF file {file_path}: {str(e)}"
 
 def extract_file_contents(node: FileNode) -> list:
     contents = []
@@ -77,7 +113,6 @@ def sum_file_tokens(node: FileNode) -> int:
         return node.tokens
     else:
         return sum(sum_file_tokens(child) for child in node.children)
-
 
 def format_file_tree(
     node: FileNode, max_tokens: int, indent: str = "", useColors: bool = False
