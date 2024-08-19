@@ -133,8 +133,10 @@ class PDFGenerator:
                 )
                 self.story.append(Spacer(1, 0.1 * inch))
                 try:
+                    # Use get_content to handle potentially large content
+                    content = node.get_content()  # Adjust max_length as needed
                     self.story.append(
-                        Preformatted(node.content, self.custom_styles["FileContent"])
+                        Preformatted(content, self.custom_styles["FileContent"])
                     )
                 except Exception as e:
                     print(f"Error adding file content for {node.path}: {e}")

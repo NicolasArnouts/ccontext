@@ -1,6 +1,5 @@
 from typing import List
 
-
 class FileNode:
     def __init__(self, name: str, path: str, node_type: str, excluded=False):
         self.name = name
@@ -27,3 +26,7 @@ class FileNode:
         for child in self.children:
             total_size += child.calculate_size()
         return total_size
+
+    def get_content(self) -> str:
+        return self.content
+        

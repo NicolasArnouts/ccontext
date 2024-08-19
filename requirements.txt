@@ -5,3 +5,5 @@ pypdf==4.2.0
 pathspec==0.12.1
 reportlab==4.2.0    
 poetry==1.8.3
+wcmatch==9.0
+pypdf==4.3.1

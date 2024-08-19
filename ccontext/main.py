@@ -131,14 +131,14 @@ def main(
     if generate_md_flag:
         generate_md(root_node, root_path)
 
-    if not generate_pdf_flag and not generate_md_flag:
-        file_contents_list = extract_file_contents(root_node)
-        initial_content = combine_initial_content(
-            root_node, root_path, context_prompt, max_tokens
-        )
-        handle_chunking_and_output(
-            initial_content, file_contents_list, max_tokens, verbose
-        )
+    # Generate clipboard output (including PDF content)
+    file_contents_list = extract_file_contents(root_node)
+    initial_content = combine_initial_content(
+        root_node, root_path, context_prompt, max_tokens
+    )
+    handle_chunking_and_output(
+        initial_content, file_contents_list, max_tokens, verbose
+    )
 
 
 if __name__ == "__main__":
