@@ -11,6 +11,3 @@ source "$SCRIPT_DIR/venv/bin/activate"
 
 # Run the main script with the provided arguments
 python3 "$SCRIPT_DIR/ccontext/main.py" "$@"
-
-
-# test
