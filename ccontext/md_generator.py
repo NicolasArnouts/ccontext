@@ -24,7 +24,7 @@ class MDGenerator:
     def generate_md(self, root_node: FileNode, root_path: str):
         self.add_section(
             "## [[SYSTEM INSTRUCTIONS]]",
-            "The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]",
+            "The following output presents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant.\n## [[END SYSTEM INSTRUCTIONS]]",
         )
         self.add_section(f"## Root Path: {root_path}")
         self.add_section("## FILE TREE ##")
@@ -51,9 +51,10 @@ class MDGenerator:
     def add_file_contents(self, node: FileNode):
         if node.node_type == "file":
             anchor = node.path.lower().replace("/", "-").replace(" ", "-")
+            content = node.get_content()
             self.add_section(
                 f'##### 📄 <a id="{anchor}"></a>{node.path} - {node.tokens} tokens',
-                f"```\n{node.content if node.content else '<Binary data>'}\n```",
+                f"```\n{content}\n```",
             )
         elif node.node_type == "directory":
             for child in node.children:

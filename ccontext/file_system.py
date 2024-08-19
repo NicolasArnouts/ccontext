@@ -1,9 +1,10 @@
 import os
 from typing import List, Tuple
-import pathspec
+from wcmatch import glob
 from ccontext.tokenizer import tokenize_text
 from ccontext.utils import get_color_for_percentage
 from colorama import Fore, Style
+from pypdf import PdfReader
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -16,28 +17,44 @@ def parse_gitignore(gitignore_path: str) -> List[str]:
 
 
 def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
-    """Checks if a path should be excluded using pathspec."""
-    spec = pathspec.PathSpec.from_lines("gitwildmatch", excludes)
-    include_spec = pathspec.PathSpec.from_lines("gitwildmatch", includes)
-
+    """Checks if a path should be excluded using wcmatch."""
     # If the path matches any include pattern, it should not be excluded
-    if include_spec.match_file(path):
+    if any(glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in includes):
         return False
 
     # Otherwise, apply the exclusion patterns
-    return spec.match_file(path)
+    return any(
+        glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in excludes
+    )
 
 
 def get_file_token_length(file_path: str) -> int:
     """Returns the token length of a file."""
     try:
+        if file_path.lower().endswith(".pdf"):
+            return get_pdf_token_length(file_path)
+        else:
+            with open(file_path, "rb") as f:
+                header = f.read(64)
+                if b"\x00" in header:  # if binary data
+                    return 0
+                f.seek(0)
+                contents = f.read().decode("utf-8")
+                tokens = tokenize_text(contents)
+                return len(tokens)
+    except Exception as e:
+        return -1
+
+
+def get_pdf_token_length(file_path: str) -> int:
+    """Returns the token length of a PDF file."""
+    try:
         with open(file_path, "rb") as f:
-            header = f.read(64)
-            if b"\x00" in header:  # if binary data
-                return 0
-            f.seek(0)
-            contents = f.read().decode("utf-8")
-            tokens = tokenize_text(contents)
+            pdf_reader = PdfReader(f)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+            tokens = tokenize_text(text)
             return len(tokens)
     except Exception as e:
         return -1

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ccontext"
-version = "0.2.11"
+version = "0.3.0"
 description = "collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible."
 authors = ["Nicolas Arnouts <arnouts.software@gmail.com>"]
 readme = "README.md"
@@ -32,6 +32,9 @@ tiktoken = "0.7.0"
 pathspec = "0.12.1"
 pypdf = "4.2.0"
 reportlab = "4.2.0"
+wcmatch = "9.0"
+pypdf=="4.3.1"
+
 
 [tool.poetry.scripts]
 ccontext = "ccontext.cli:main"
