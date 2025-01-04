@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Load Config",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/Users/narn/Desktop/ccontext/ccontext/main.py",
+            "args": [
+                "-f",
+                "/Users/narn/Desktop/ccontext/ccontext/main.py:load_config",
+                "--function-details"
+            ],
+            "console": "integratedTerminal",
+            "python": "/Users/narn/Desktop/ccontext/venv/bin/python"
+        }
+    ]
+}

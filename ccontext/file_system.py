@@ -1,10 +1,11 @@
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from wcmatch import glob
 from ccontext.tokenizer import tokenize_text
 from ccontext.utils import get_color_for_percentage
 from colorama import Fore, Style
 from pypdf import PdfReader
+from pathlib import Path  # Add this import at the top
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -18,13 +19,20 @@ def parse_gitignore(gitignore_path: str) -> List[str]:
 
 def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
     """Checks if a path should be excluded using wcmatch."""
+    # Normalize the path to POSIX-style for consistent matching
+    normalized_path = Path(path).as_posix()
+
     # If the path matches any include pattern, it should not be excluded
-    if any(glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in includes):
+    if any(
+        glob.globmatch(normalized_path, pattern, flags=glob.GLOBSTAR)
+        for pattern in includes
+    ):
         return False
 
     # Otherwise, apply the exclusion patterns
     return any(
-        glob.globmatch(path, pattern, flags=glob.GLOBSTAR) for pattern in excludes
+        glob.globmatch(normalized_path, pattern, flags=glob.GLOBSTAR)
+        for pattern in excludes
     )
 
 
@@ -62,23 +70,58 @@ def get_pdf_token_length(file_path: str) -> int:
 
 def collect_excludes_includes(
     default_excludes: List[str],
-    additional_excludes: List[str],
-    additional_includes: List[str],
-    included_folders_files: List[str],
+    additional_excludes: Union[str, List[str], None],
+    additional_includes: Union[str, List[str], None],
+    included_folders_files: Union[str, List[str], None],
     root_path: str,
     ignore_gitignore: bool,
 ) -> Tuple[List[str], List[str]]:
     """Combines default excluded items with additional exclusions and includes, and parses .gitignore."""
+    # Ensure additional_excludes is a list
     if isinstance(additional_excludes, str):
-        additional_excludes = additional_excludes.split("|")
+        additional_excludes = [
+            pattern.strip()
+            for pattern in additional_excludes.split("|")
+            if pattern.strip()
+        ]
+    elif isinstance(additional_excludes, list):
+        additional_excludes = [
+            pattern.strip() for pattern in additional_excludes if pattern.strip()
+        ]
+    else:
+        additional_excludes = []
+
+    # Ensure additional_includes is a list
     if isinstance(additional_includes, str):
-        additional_includes = additional_includes.split("|")
+        additional_includes = [
+            pattern.strip()
+            for pattern in additional_includes.split("|")
+            if pattern.strip()
+        ]
+    elif isinstance(additional_includes, list):
+        additional_includes = [
+            pattern.strip() for pattern in additional_includes if pattern.strip()
+        ]
+    else:
+        additional_includes = []
+
+    # Ensure included_folders_files is a list
     if isinstance(included_folders_files, str):
-        included_folders_files = included_folders_files.split("|")
+        included_folders_files = [
+            pattern.strip()
+            for pattern in included_folders_files.split("|")
+            if pattern.strip()
+        ]
+    elif isinstance(included_folders_files, list):
+        included_folders_files = [
+            pattern.strip() for pattern in included_folders_files if pattern.strip()
+        ]
+    else:
+        included_folders_files = []
 
     # Command line arguments have highest priority
-    includes = additional_includes
-    excludes = additional_excludes
+    includes = additional_includes  # Now a List[str]
+    excludes = additional_excludes  # Now a List[str]
 
     # Include files from config if not already included via command line
     includes += [item for item in included_folders_files if item not in includes]

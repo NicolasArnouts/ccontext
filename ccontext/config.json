@@ -1,6 +1,6 @@
 {
   "verbose": false,
-  "max_tokens": 32000,
+  "max_tokens": 115000,
   "model_type": "gpt-4o",
   "buffer_size": 0.05,
   "excluded_folders_files": [
@@ -9,7 +9,7 @@
     "**/build",
     "**/node_modules/**",
     "**/venv",
-    "**/__pycache__/**",
+    "**/__pycache__",
     "**/package-lock.json",
     "**/ccontext.egg-info",
     "**/dist",
@@ -25,19 +25,16 @@
     "**/composer.lock",
     "**/*.lock",
     "**/vendor",
-    "**/laravel_access.log"
+    "**/laravel_access.log",
+    "**/gpt-crawler"
   ],
   "included_folders_files": [],
   "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. Always give full code snippets from and the relative file paths of the files where you change code. Clearly explain what steps you are going to undertake, then proceed action and complete them one by one. Think ahead. [[END SYSTEM INSTRUCTIONS]]",
   "urls_to_crawl": [
     {
       "url": "https://www.django-rest-framework.org/",
-      "match": [
-        "https://www.django-rest-framework.org/**"
-      ],
-      "exclude": [
-        "https://www.django-rest-framework.org/community/**"
-      ],
+      "match": ["https://www.django-rest-framework.org/**"],
+      "exclude": ["https://www.django-rest-framework.org/community/**"],
       "selector": "",
       "maxPagesToCrawl": 100,
       "outputFileName": "django-rest-framework.org.json",
