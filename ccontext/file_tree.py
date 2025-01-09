@@ -1,14 +1,18 @@
+# ccontext/file_tree.py
+import io
 import os
 import time
 from typing import List, Tuple
+
+import mammoth
+from colorama import Fore, Style
+from pypdf import PdfReader
+from wcmatch import glob
+
 from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
-from ccontext.utils import is_verbose, get_color_for_percentage
-from colorama import Fore, Style
-from wcmatch import glob
-from pypdf import PdfReader
-import io
+from ccontext.utils import get_color_for_percentage, is_verbose
 
 
 def build_file_tree(
@@ -52,6 +56,8 @@ def tokenize_file_content(file_path: str) -> Tuple[int, str]:
     try:
         if file_path.lower().endswith(".pdf"):
             return extract_pdf_content(file_path)
+        elif file_path.lower().endswith(".docx"):
+            return extract_docx_content(file_path)
 
         with open(file_path, "rb") as f:
             content = f.read()
@@ -89,6 +95,21 @@ def extract_pdf_content(file_path: str) -> Tuple[int, str]:
         return len(tokens), clean_text
     except Exception as e:
         return 0, f"Error reading PDF file {file_path}: {str(e)}"
+
+
+def extract_docx_content(file_path: str) -> Tuple[int, str]:
+    try:
+        with open(file_path, "rb") as docx_file:
+            result = mammoth.convert_to_markdown(docx_file)
+            markdown_content = result.value
+
+        if is_verbose():
+            print(f"Processing DOCX: {file_path}")
+
+        tokens = tokenize_text(markdown_content)
+        return len(tokens), markdown_content
+    except Exception as e:
+        return 0, f"Error reading DOCX file {file_path}: {str(e)}"
 
 
 def extract_file_contents(node: FileNode) -> list:

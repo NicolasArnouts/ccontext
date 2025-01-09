@@ -1,11 +1,15 @@
+# ccontext/file_system.py
 import os
+from pathlib import Path  # Add this import at the top
 from typing import List, Tuple, Union
-from wcmatch import glob
-from ccontext.tokenizer import tokenize_text
-from ccontext.utils import get_color_for_percentage
+
+import mammoth
 from colorama import Fore, Style
 from pypdf import PdfReader
-from pathlib import Path  # Add this import at the top
+from wcmatch import glob
+
+from ccontext.tokenizer import tokenize_text
+from ccontext.utils import get_color_for_percentage
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -41,6 +45,8 @@ def get_file_token_length(file_path: str) -> int:
     try:
         if file_path.lower().endswith(".pdf"):
             return get_pdf_token_length(file_path)
+        elif file_path.lower().endswith(".docx"):
+            return get_docx_token_length(file_path)
         else:
             with open(file_path, "rb") as f:
                 header = f.read(64)
@@ -62,6 +68,18 @@ def get_pdf_token_length(file_path: str) -> int:
             text = ""
             for page in pdf_reader.pages:
                 text += page.extract_text()
+            tokens = tokenize_text(text)
+            return len(tokens)
+    except Exception as e:
+        return -1
+
+
+def get_docx_token_length(file_path: str) -> int:
+    """Returns the token length of a DOCX file."""
+    try:
+        with open(file_path, "rb") as docx_file:
+            result = mammoth.extract_raw_text(docx_file)
+            text = result.value
             tokens = tokenize_text(text)
             return len(tokens)
     except Exception as e:
