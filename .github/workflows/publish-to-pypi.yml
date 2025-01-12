@@ -15,16 +15,27 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Set Up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+
       - name: Install Poetry
         run: pipx install poetry
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.in-project true
+          poetry config installer.max-workers 4
+
       - name: Install Dependencies
-        run: poetry install
+        run: |
+          poetry install --no-interaction --without darwin
+
       - name: Build Distribution Packages
         run: poetry build
+
       - name: Upload Distribution Packages
         uses: actions/upload-artifact@v3
         with:
