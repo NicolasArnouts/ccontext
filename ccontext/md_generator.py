@@ -1,5 +1,8 @@
-from ccontext.file_node import FileNode
+import os
 from pathlib import Path
+
+from ccontext.file_node import FileNode
+from ccontext.utils import is_binary_file
 
 
 class MDGenerator:
@@ -44,8 +47,14 @@ class MDGenerator:
                 self.format_file_tree(child, indent + ("-" * 4), anchor)
         elif node.node_type == "file":
             anchor = node.path.lower().replace("/", "-").replace(" ", "-")
+            # Check if it's a binary file
+            is_binary = is_binary_file(os.path.join(os.getcwd(), node.path))
+            file_emoji = "📎" if is_binary else "📄"
+
+            # Add a note for binary files using emphasis
+            name_display = f"*{node.name}*" if is_binary else node.name
             self.md_content.append(
-                f"{indent} [📄 {node.tokens} {node.name}](#{anchor})\n"
+                f"{indent} [{file_emoji} {node.tokens} {name_display}](#{anchor})\n"
             )
 
     def add_file_contents(self, node: FileNode):
@@ -69,7 +78,8 @@ def generate_md(root_node: FileNode, root_path: str):
 
 if __name__ == "__main__":
     import argparse
-    from ccontext.main import load_config, build_file_tree
+
+    from ccontext.main import build_file_tree, load_config
 
     parser = argparse.ArgumentParser(
         description="Generate Markdown file of directory tree and file contents."

@@ -1,7 +1,8 @@
 from colorama import Fore, Style
-from ccontext.utils import format_number
-from ccontext.tokenizer import chunk_text, tokenize_text
+
 from ccontext.clipboard import copy_to_clipboard
+from ccontext.tokenizer import chunk_text, tokenize_text
+from ccontext.utils import format_number
 
 
 def handle_chunking_and_output(

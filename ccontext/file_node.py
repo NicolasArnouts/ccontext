@@ -1,5 +1,6 @@
 from typing import List
 
+
 class FileNode:
     def __init__(self, name: str, path: str, node_type: str, excluded=False):
         self.name = name
@@ -29,4 +30,3 @@ class FileNode:
 
     def get_content(self) -> str:
         return self.content
-        

@@ -4,12 +4,12 @@ from pathlib import Path  # Add this import at the top
 from typing import List, Tuple, Union
 
 import mammoth
-from colorama import Fore, Style
+from colorama import Style
 from pypdf import PdfReader
 from wcmatch import glob
 
 from ccontext.tokenizer import tokenize_text
-from ccontext.utils import get_color_for_percentage
+from ccontext.utils import get_color_for_percentage, is_binary_file
 
 
 def parse_gitignore(gitignore_path: str) -> List[str]:
@@ -43,20 +43,22 @@ def is_excluded(path: str, excludes: List[str], includes: List[str]) -> bool:
 def get_file_token_length(file_path: str) -> int:
     """Returns the token length of a file."""
     try:
-        if file_path.lower().endswith(".pdf"):
-            return get_pdf_token_length(file_path)
-        elif file_path.lower().endswith(".docx"):
-            return get_docx_token_length(file_path)
-        else:
-            with open(file_path, "rb") as f:
-                header = f.read(64)
-                if b"\x00" in header:  # if binary data
-                    return 0
-                f.seek(0)
-                contents = f.read().decode("utf-8")
-                tokens = tokenize_text(contents)
+        # For binary/uploadable files, return 1 token (for the reference)
+        if is_binary_file(file_path):
+            return -1
+
+        # For text files, calculate tokens
+        with open(file_path, "rb") as f:
+            content = f.read()
+            if b"\x00" in content[:1024]:  # Quick binary check
+                return 1
+            try:
+                text = content.decode("utf-8")
+                tokens = tokenize_text(text)
                 return len(tokens)
-    except Exception as e:
+            except UnicodeDecodeError:
+                return 1  # Treat as binary if we can't decode
+    except Exception:
         return -1
 
 
@@ -70,7 +72,7 @@ def get_pdf_token_length(file_path: str) -> int:
                 text += page.extract_text()
             tokens = tokenize_text(text)
             return len(tokens)
-    except Exception as e:
+    except Exception:
         return -1
 
 
@@ -82,7 +84,7 @@ def get_docx_token_length(file_path: str) -> int:
             text = result.value
             tokens = tokenize_text(text)
             return len(tokens)
-    except Exception as e:
+    except Exception:
         return -1
 
 

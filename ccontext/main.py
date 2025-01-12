@@ -1,26 +1,21 @@
-import os
-import json
-from colorama import Fore, Style
-from pathlib import Path
 import importlib.resources as resources
+import json
+import os
+from pathlib import Path
 
-from ccontext.run_crawlers import run_crawler
-from ccontext.utils import initialize_environment, set_verbose
-from ccontext.content_handler import (
-    combine_initial_content,
-)
-from ccontext.output_handler import handle_chunking_and_output
-from ccontext.file_system import collect_excludes_includes
+from colorama import Fore, Style
+
 from ccontext.argument_parser import parse_arguments
-from ccontext.tokenizer import set_model_type_and_buffer
-from ccontext.pdf_generator import generate_pdf
-from ccontext.md_generator import generate_md
-from ccontext.file_tree import (
-    build_file_tree,
-    format_file_tree,
-    extract_file_contents,
-)
 from ccontext.configurator import copy_default_config
+from ccontext.content_handler import combine_initial_content
+from ccontext.file_system import collect_excludes_includes
+from ccontext.file_tree import build_file_tree, extract_file_contents, format_file_tree
+from ccontext.md_generator import generate_md
+from ccontext.output_handler import handle_chunking_and_output
+from ccontext.pdf_generator import generate_pdf
+from ccontext.run_crawlers import run_crawler
+from ccontext.tokenizer import set_model_type_and_buffer
+from ccontext.utils import initialize_environment, set_verbose
 
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
@@ -74,6 +69,9 @@ def main(
     root_path = os.path.abspath(root_path or os.getcwd())
     config = load_config(root_path, config_path)
 
+    # Get uploadable extensions from config
+    uploadable_extensions = set(config.get("uploadable_extensions", []))
+
     # Command line arguments have the highest priority
     cmd_includes = includes or []
     cmd_excludes = excludes or []
@@ -119,7 +117,7 @@ def main(
             run_crawler(url_config)
 
     # Build file tree once and use it
-    root_node = build_file_tree(root_path, excludes, includes)
+    root_node = build_file_tree(root_path, excludes, includes, uploadable_extensions)
 
     # Always print the file tree in the CLI using the new format_file_tree function
     tree_output = format_file_tree(root_node, max_tokens, useColors=True)
@@ -131,14 +129,12 @@ def main(
     if generate_md_flag:
         generate_md(root_node, root_path)
 
-    # Generate clipboard output (including PDF content)
+    # Generate clipboard output
     file_contents_list = extract_file_contents(root_node)
     initial_content = combine_initial_content(
         root_node, root_path, context_prompt, max_tokens
     )
-    handle_chunking_and_output(
-        initial_content, file_contents_list, max_tokens, verbose
-    )
+    handle_chunking_and_output(initial_content, file_contents_list, max_tokens, verbose)
 
 
 if __name__ == "__main__":

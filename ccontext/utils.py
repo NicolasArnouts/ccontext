@@ -1,3 +1,6 @@
+# ccontext/utils.py
+import os
+
 from colorama import init
 
 verbose_state = {"verbose": False}
@@ -57,3 +60,27 @@ def get_color_for_percentage(percentage):
             (percentage - 50) / 50, (255, 165, 0), (255, 0, 0)
         )  # Orange to Red
     return rgb_to_ansi(*color)
+
+
+def is_binary_file(file_path: str) -> bool:
+    """
+    Simple check if file is binary by attempting to read it as text.
+    Returns True if file is binary, False if it's text.
+    """
+    try:
+        with open(file_path, "tr") as check_file:  # try open file in text mode
+            check_file.read()
+            return False
+    except UnicodeDecodeError:  # if fail then file is non-text (binary)
+        return True
+
+
+def should_upload_file(file_path: str, uploadable_extensions: set) -> bool:
+    """
+    Determines if a file should be uploaded based on its extension.
+    """
+
+    if not uploadable_extensions:
+        return False
+    ext = os.path.splitext(file_path)[1].lower()
+    return ext in uploadable_extensions

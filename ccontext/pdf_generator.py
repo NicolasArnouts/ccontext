@@ -1,20 +1,23 @@
 import os
+
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import (
-    SimpleDocTemplate,
+    PageBreak,
     Paragraph,
+    Preformatted,
+    SimpleDocTemplate,
     Spacer,
     Table,
     TableStyle,
-    PageBreak,
-    Preformatted,
 )
-from reportlab.lib.units import inch
-from reportlab.lib import colors
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.pdfbase import pdfmetrics
+
 from ccontext.file_node import FileNode
+from ccontext.utils import is_binary_file
 
 
 class PDFGenerator:
@@ -109,10 +112,17 @@ class PDFGenerator:
             section_anchor = f"section_{len(self.toc)}"
             self.toc.append((node.path, section_anchor))
 
-            icon = "📄" if not node.excluded else "🚫📄"
+            # Check if it's a binary file
+            is_binary = is_binary_file(os.path.join(os.getcwd(), node.path))
+            file_emoji = "📎" if is_binary else "📄"
+            icon = file_emoji if not node.excluded else f"🚫{file_emoji}"
+
+            # Format name with yellow color for binary files
+            name_style = ' color="yellow"' if is_binary else ""
             self.story.append(
                 Paragraph(
-                    f"{indent}<font name='NotoEmoji'>📄</font> {node.tokens} <a href=\"#{section_anchor}\">{node.name}</a>",
+                    f"{indent}<font name='NotoEmoji'>{icon}</font> {node.tokens} "
+                    f'<a href="#{section_anchor}"><font{name_style}>{node.name}</font></a>',
                     self.custom_styles["FileTree"],
                 )
             )
@@ -195,7 +205,8 @@ def generate_pdf(root_path: str, root_node: FileNode):
 
 if __name__ == "__main__":
     import argparse
-    from ccontext.main import load_config, build_file_tree
+
+    from ccontext.main import build_file_tree, load_config
 
     parser = argparse.ArgumentParser(
         description="Generate PDF of directory tree and file contents."

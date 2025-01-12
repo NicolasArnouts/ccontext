@@ -1,22 +1,23 @@
 # ccontext/file_tree.py
-import io
 import os
 import time
 from typing import List, Tuple
 
-import mammoth
 from colorama import Fore, Style
-from pypdf import PdfReader
-from wcmatch import glob
 
 from ccontext.file_node import FileNode
 from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
-from ccontext.utils import get_color_for_percentage, is_verbose
+from ccontext.utils import (
+    get_color_for_percentage,
+    is_binary_file,
+    is_verbose,
+    should_upload_file,
+)
 
 
 def build_file_tree(
-    root_path: str, excludes: List[str], includes: List[str]
+    root_path: str, excludes: List[str], includes: List[str], uploadable_extensions: set
 ) -> FileNode:
     # Record the start time
     start_time = time.time()
@@ -45,71 +46,38 @@ def build_file_tree(
                 child_node = traverse_directory(full_path)
                 node.add_child(child_node)
         elif node_type == "file" and not excluded:
-            tokens, content = tokenize_file_content(current_path)
+            tokens, content = tokenize_file_content(current_path, uploadable_extensions)
             node.set_tokens_and_content(tokens, content)
         return node
 
     return traverse_directory(root_path)
 
 
-def tokenize_file_content(file_path: str) -> Tuple[int, str]:
+def tokenize_file_content(
+    file_path: str, uploadable_extensions: set
+) -> Tuple[int, str]:
+    """Returns token count and content for a file."""
     try:
-        if file_path.lower().endswith(".pdf"):
-            return extract_pdf_content(file_path)
-        elif file_path.lower().endswith(".docx"):
-            return extract_docx_content(file_path)
+        # First check if file should be uploaded regardless of binary status
+        if should_upload_file(file_path, uploadable_extensions):
+            file_ref = f"<file>{os.path.abspath(file_path)}</file>"
+            return 1, file_ref
 
-        with open(file_path, "rb") as f:
-            content = f.read()
+        # If not uploadable, check if it's binary
+        if is_binary_file(file_path):
+            return 0, ""  # Skip binary files that aren't in uploadable list
 
-        if b"\x00" in content[:1024]:  # Check if file is binary
-            return 0, "Binary data"
+        # Handle text files
+        with open(file_path, "r", encoding="utf-8") as f:
+            text_content = f.read()
+            if is_verbose():
+                print(file_path)
+            tokens = tokenize_text(text_content)
+            return len(tokens), text_content
 
-        try:
-            text_content = content.decode("utf-8")
-        except UnicodeDecodeError:
-            text_content = content.decode("latin-1")  # Fallback encoding
-
-        if is_verbose():
-            print(file_path)
-
-        tokens = tokenize_text(text_content)
-        return len(tokens), text_content
     except Exception as e:
-        return 0, f"Error reading file {file_path}: {str(e)}"
-
-
-def extract_pdf_content(file_path: str) -> Tuple[int, str]:
-    try:
-        with open(file_path, "rb") as file:
-            pdf_reader = PdfReader(file)
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text() + "\n\n"
-
-        if is_verbose():
-            print(f"Processing PDF: {file_path}")
-
-        clean_text = text.strip()
-        tokens = tokenize_text(clean_text)
-        return len(tokens), clean_text
-    except Exception as e:
-        return 0, f"Error reading PDF file {file_path}: {str(e)}"
-
-
-def extract_docx_content(file_path: str) -> Tuple[int, str]:
-    try:
-        with open(file_path, "rb") as docx_file:
-            result = mammoth.convert_to_markdown(docx_file)
-            markdown_content = result.value
-
-        if is_verbose():
-            print(f"Processing DOCX: {file_path}")
-
-        tokens = tokenize_text(markdown_content)
-        return len(tokens), markdown_content
-    except Exception as e:
-        return 0, f"Error reading DOCX file {file_path}: {str(e)}"
+        print(f"{Fore.YELLOW}Error reading file {file_path}: {str(e)}{Style.RESET_ALL}")
+        return 0, ""
 
 
 def extract_file_contents(node: FileNode) -> list:
@@ -146,8 +114,23 @@ def format_file_tree(
         percentage = node.tokens / max_tokens if max_tokens else 0
         color = get_color_for_percentage(percentage) if useColors else ""
         reset = Style.RESET_ALL if useColors else ""
-        if node.excluded:
-            output += f"{indent}[Excluded] 🚫📄 {node.name}\n"
+
+        # Check if it's a binary file
+        is_binary = is_binary_file(os.path.join(os.getcwd(), node.path))
+        file_emoji = "📎" if is_binary else "📄"
+
+        # Format the name - yellow for binary files
+        if is_binary:
+            name_display = (
+                f"{Fore.YELLOW}{node.name}{Style.RESET_ALL}" if useColors else node.name
+            )
         else:
-            output += f"{indent}📄 {color}{node.tokens}{reset} {node.name}\n"
+            name_display = node.name
+
+        if node.excluded:
+            output += f"{indent}[Excluded] 🚫{file_emoji} {name_display}\n"
+        else:
+            output += (
+                f"{indent}{file_emoji} {color}{node.tokens}{reset} {name_display}\n"
+            )
     return output

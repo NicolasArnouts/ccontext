@@ -39,7 +39,7 @@ export const defaultConfig: Config = {{
 
     with open(config_file_path, "w") as config_file:
         config_file.write(config_content)
-        #print(f"{Fore.GREEN}Config written to {config_file_path}{Style.RESET_ALL}")
+        # print(f"{Fore.GREEN}Config written to {config_file_path}{Style.RESET_ALL}")
 
 
 # Function to run npm start command

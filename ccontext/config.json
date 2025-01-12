@@ -3,6 +3,19 @@
   "max_tokens": 115000,
   "model_type": "gpt-4o",
   "buffer_size": 0.05,
+  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. Always give full code snippets from and the relative file paths of the files where you change code. Clearly explain what steps you are going to undertake, then proceed action and complete them one by one. Think ahead. [[END SYSTEM INSTRUCTIONS]]",
+  "urls_to_crawl": [
+    {
+      "url": "https://www.django-rest-framework.org/",
+      "match": ["https://www.django-rest-framework.org/**"],
+      "exclude": ["https://www.django-rest-framework.org/community/**"],
+      "selector": "",
+      "maxPagesToCrawl": 100,
+      "outputFileName": "django-rest-framework.org.json",
+      "maxTokens": 10000000
+    }
+  ],
+  "included_folders_files": [],
   "excluded_folders_files": [
     "**/.git",
     "**/bin",
@@ -26,19 +39,58 @@
     "**/*.lock",
     "**/vendor",
     "**/laravel_access.log",
-    "**/gpt-crawler"
+    "**/gpt-crawler",
+    "**/*.DS_Store",
+    "**/*.tox"
   ],
-  "included_folders_files": [],
-  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. Always give full code snippets from and the relative file paths of the files where you change code. Clearly explain what steps you are going to undertake, then proceed action and complete them one by one. Think ahead. [[END SYSTEM INSTRUCTIONS]]",
-  "urls_to_crawl": [
-    {
-      "url": "https://www.django-rest-framework.org/",
-      "match": ["https://www.django-rest-framework.org/**"],
-      "exclude": ["https://www.django-rest-framework.org/community/**"],
-      "selector": "",
-      "maxPagesToCrawl": 100,
-      "outputFileName": "django-rest-framework.org.json",
-      "maxTokens": 2000000
-    }
+  "uploadable_extensions": [
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx",
+
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".tiff",
+    ".webp",
+    ".heic",
+
+    ".mp3",
+    ".wav",
+    ".ogg",
+    ".flac",
+    ".aac",
+    ".m4a",
+
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mov",
+    ".wmv",
+    ".webm",
+
+    ".zip",
+    ".rar",
+    ".7z",
+    ".tar",
+    ".gz",
+
+    ".exe",
+    ".dll",
+    ".iso",
+    ".dmg",
+    ".bin",
+    ".dat",
+    ".apk",
+    ".img",
+    ".so",
+    ".swf",
+    ".psd"
   ]
 }

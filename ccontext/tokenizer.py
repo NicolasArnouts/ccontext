@@ -2,6 +2,7 @@ import tiktoken
 from typing import List
 from ccontext.file_node import FileNode
 
+
 def set_model_type_and_buffer(model_type: str, buffer_size: float):
     """
     Sets the model type and buffer size for tokenization.
@@ -13,6 +14,7 @@ def set_model_type_and_buffer(model_type: str, buffer_size: float):
     global MODEL_TYPE, BUFFER_SIZE
     MODEL_TYPE = model_type
     BUFFER_SIZE = buffer_size
+
 
 def tokenize_text(text: str) -> list:
     """
@@ -26,6 +28,7 @@ def tokenize_text(text: str) -> list:
     """
     encoding = tiktoken.encoding_for_model(MODEL_TYPE)
     return encoding.encode(text)
+
 
 def chunk_text(file_contents: list, max_tokens: int) -> list:
     """
@@ -91,6 +94,7 @@ def chunk_text(file_contents: list, max_tokens: int) -> list:
 
     return chunks
 
+
 def chunk_nodes(root_node: FileNode, max_tokens: int) -> List[List[FileNode]]:
     """
     Splits the file nodes into chunks that fit within the max_tokens limit.
@@ -119,12 +123,12 @@ def chunk_nodes(root_node: FileNode, max_tokens: int) -> List[List[FileNode]]:
     def traverse(node: FileNode):
         nonlocal current_chunk, current_chunk_tokens
 
-        if node.node_type == 'file':
+        if node.node_type == "file":
             if current_chunk_tokens + node.tokens > available_tokens:
                 add_chunk()
             current_chunk.append(node)
             current_chunk_tokens += node.tokens
-        elif node.node_type == 'directory':
+        elif node.node_type == "directory":
             for child in node.children:
                 traverse(child)
 
@@ -134,6 +138,7 @@ def chunk_nodes(root_node: FileNode, max_tokens: int) -> List[List[FileNode]]:
         add_chunk()
 
     return chunks
+
 
 # Set the default model type and buffer size
 set_model_type_and_buffer("gpt-4", 0.05)
