@@ -4,117 +4,114 @@
 
 ## Features
 
+**Features**
+
 - 🌟 **Easy Setup**: Quick installation and configuration.
+- 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
+- 💾 **Binary File Support**: Handle various binary files including PDFs, Word documents, images, audio, and video files.
 - 🔧 **Configurable Exclusions and Inclusions**: Flexibly specify which files and directories to include or exclude.
 - ✂️ **Tokenization and Chunking**: Automatically handles tokenization and chunking to stay within LLM token limits.
-- 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
 - 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📄 **Markdown and PDF Generation**: Generate detailed Markdown and PDF files of the directory structure and file contents.
 - 🌐 **Crawling of (documentation) Sites**: Crawl and gather data from multiple sites using a specified list of URLs.
 - 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
 
+## Table of Contents
 
-## Example output:
-```sh
-kiko@lappie:~/.USER_SCRIPTS/ccontext$ ccontext
-Using user config file: /home/kiko/.ccontext/config.json
-Root Path: /home/kiko/.USER_SCRIPTS/ccontext
-
-📁 ccontext
-    📁 .github
-        📁 workflows
-            📄 751 publish-to-pypi.yml
-    📄 1664 .gitignore
-    📁 .vscode
-        📄 13 settings.json
-    📄 9 MANIFEST.in
-    📄 1392 README.md
-    📁 ccontext
-        📄 0 Helvetica.ttf
-        📄 0 NotoEmoji-VariableFont_wght.ttf
-        📄 0 __init__.py
-        📄 18 __main__.py
-        📄 452 argument_parser.py
-        📄 79 cli.py
-        📄 699 clipboard.py
-        📄 216 config.json
-        📄 231 configurator.py
-        📄 168 content_handler.py
-        📄 209 file_node.py
-        📄 779 file_system.py
-        📄 655 file_tree.py
-        📄 1089 main.py
-        📄 800 md_generator.py
-        📄 774 output_handler.py
-        📄 1536 pdf_generator.py
-        📄 975 tokenizer.py
-        📄 414 utils.py
-    📄 135 ideas.MD
-    📄 56 requirements.txt
-    📄 87 run_ccontext.sh
-    📄 291 setup.py
-
-
-Tokens: 14,718/32,000
-
-Output copied to clipboard!
-```
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Binary File Handling](#binary-file-handling)
+- [Document Crawling](#document-crawling)
+- [Use Cases and Examples](#use-cases-and-examples)
+- [Troubleshooting](#troubleshooting)
+- [Development Guide](#development-guide)
 
 ## Installation
 
-### Using pip
+### Using pipx (Recommended)
 
-ccontext is available on PyPI and can be installed using pip:
+We recommend installing ccontext using pipx. pipx is a tool that lets you install and run Python applications in isolated environments, ensuring clean installation and easy management of CLI applications.
 
-```sh
-pipx install ccontext
-```
+1. First, install pipx if you haven't already:
 
-### From Source
+   ```sh
+   # On macOS
+   brew install pipx
+   pipx ensurepath
+
+   # On Ubuntu/Debian
+   sudo apt install pipx
+   pipx ensurepath
+
+   # On Windows
+   python -m pip install --user pipx
+   python -m pipx ensurepath
+   # or read https://pipx.pypa.io/stable/installation/#on-windows
+   ```
+
+2. Install ccontext using pipx:
+
+   ```sh
+   pipx install ccontext
+   ```
+
+Why use pipx?
+
+- **Isolated Environment**: Each application runs in its own virtual environment
+- **No Dependency Conflicts**: Avoids conflicts with other Python packages
+- **Easy Updates**: Simple command to upgrade (`pipx upgrade ccontext`)
+- **Clean Uninstallation**: Remove everything with one command (`pipx uninstall ccontext`)
+- **Global Access**: Installed applications are available system-wide
+
+### Alternative: Installing from Source
+
+If you prefer to install from source:
 
 1. Clone the repository:
 
-    ```sh
-    git clone https://github.com/oxillix/ccontext.git
-    cd ccontext
-    ```
+   ```sh
+   git clone https://github.com/oxillix/ccontext.git
+   cd ccontext
+   ```
 
 2. Set up a virtual environment:
 
-    ```sh
-    python3 -m venv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    ```
+   ```sh
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+   ```
 
 3. Install dependencies:
 
-    ```sh
-    pip install -r requirements.txt
-    ```
+   ```sh
+   pip install -r requirements.txt
+   ```
 
 4. Install the package:
 
-    ```sh
-    pip install .
-    ```
+   ```sh
+   pip install .
+   ```
 
 ## Usage
 
 ### Basic Usage
 
-1. Run `ccontext` in the current folder with default settings defined in `~/.ccontext/config.json`:
+1. Run `ccontext` in the folder to ccollect with default settings defined in `~/.ccontext/config.json`:
 
-    ```sh
-    ccontext
-    ```
+   ```sh
+   ccontext
+   ```
 
 2. Specify a root path, exclusions, and inclusions:
 
-    ```sh
-    ccontext -p /path/to/directory -e ".git|node_modules" -i "important_file.txt|docs"
-    ```
+   ```sh
+   ccontext -p /path/to/directory -e ".git|node_modules" -i "important_file.txt|docs"
+   ```
 
 ### Command-Line Arguments
+
 - `-h, --help`: Show help message.
 - `-p, --root_path`: The root path to start the directory tree (default: current directory).
 - `-e, --excludes`: Additional files or directories to exclude, separated by `|`, e.g., `node_modules|.git`.
@@ -125,8 +122,7 @@ pipx install ccontext
 - `-ig, --ignore_gitignore`: Ignore the `.gitignore` file for exclusions.
 - `-g, --generate-pdf`: Generate a PDF of the directory tree and file contents.
 - `-gm, --generate-md`: Generate a Markdown file of the directory tree and file contents.
-- `--crawl`: Crawls the sites specified in the config
- 
+- `--crawl`: Crawls the sites specified in the config.
 
 ### Example
 
@@ -134,76 +130,403 @@ pipx install ccontext
 ccontext -p /home/user/project -e ".git|build" -i "README.md|src"
 ```
 
-### Configuration
+## Configuration
 
-You can customize the behavior of `ccontext` by creating a configuration file. The default configuration file is `config.json` located in the user's home directory under `.ccontext`. You can also provide a custom configuration file via the `-c` argument.
+### Configuration File Location
 
-### Sample `config.json`
+ccontext looks for configuration in the following order:
+
+1. Custom config file specified via `-c` argument
+2. `.ccontext-config.json` in the current directory
+   - If present, ccontext will automatically detect and use this local configuration file
+   - Create this file in the same directory where you run the ccontext command
+3. `~/.ccontext/config.json` (default user configuration)
+
+### Configuration Options
 
 ```json
 {
-  "verbose": false, // prints more data on the screen
-  "max_tokens": 32000, // max token size of input prompt / maximum size of the chunks
-  "model_type": "gpt-4o", // sets tiktoken.encoding_for_model()
-  "buffer_size": 0.05, // a buffer for max_tokens that limits how full the chunks can be
-  "excluded_folders_files": [
-    ".git",
-    "bin",
-    "build",
-    "node_modules",
-    "venv",
-    "__pycache__",
-    "package-lock.json",
-    "ccontext.egg-info",
-    "dist",
-    "__tests__",
-    "coverage",
-    ".next",
-    "pnpm-lock.yaml",
-    "poetry.lock",
-    "ccontext-output.pdf",
-    "ccontext-output.md",
-    ".phpstorm.meta.php",
-    "*.min.js",
-    "composer.lock",
-    "*.lock",
-    "vendor",
-    "laravel_access.log"
-  ],
-  "included_folders_files": [],
-  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. [[END SYSTEM INSTRUCTIONS]]",
+  "verbose": false, // Enable detailed output
+  "max_tokens": 115000, // Maximum tokens before chunking
+  "model_type": "gpt-4o", // LLM model type for tokenization
+  "buffer_size": 0.05, // Token buffer size (0-1)
+
+  // System prompt for LLM context
+  "context_prompt": "[[SYSTEM INSTRUCTIONS]] The following output represents...",
+
+  // Web crawler configuration
   "urls_to_crawl": [
     {
       "url": "https://www.django-rest-framework.org/",
-      "match": [
-        "https://www.django-rest-framework.org/**"
-      ],
-      "exclude": [
-        "https://www.django-rest-framework.org/community/**"
-      ],
+      "match": ["https://www.django-rest-framework.org/**"],
+      "exclude": ["https://www.django-rest-framework.org/community/**"],
       "selector": "",
       "maxPagesToCrawl": 100,
       "outputFileName": "django-rest-framework.org.json",
+      "maxTokens": 10000000
+    }
+  ],
+
+  // Files/folders to explicitly include
+  "included_folders_files": [],
+
+  // Files/folders to exclude (supports glob patterns)
+  "excluded_folders_files": [
+    "**/.git",
+    "**/bin",
+    "**/build",
+    "**/node_modules/**",
+    "**/venv",
+    "**/__pycache__",
+    "**/package-lock.json",
+    "**/ccontext.egg-info",
+    "**/dist",
+    "**/__tests__",
+    "**/coverage",
+    "**/.next",
+    "**/pnpm-lock.yaml",
+    "**/poetry.lock",
+    "**/ccontext-output.pdf",
+    "**/ccontext-output.md",
+    "**/*.phpstorm.meta.php",
+    "**/*.min.js",
+    "**/composer.lock",
+    "**/*.lock",
+    "**/vendor",
+    "**/laravel_access.log",
+    "**/gpt-crawler",
+    "**/*.DS_Store",
+    "**/*.tox"
+  ],
+
+  // File extensions that can be uploaded to LLMs
+  "uploadable_extensions": [
+    // Documents
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx",
+
+    // Images
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".bmp",
+    ".tiff",
+    ".webp",
+    ".heic",
+
+    // Audio
+    ".mp3",
+    ".wav",
+    ".ogg",
+    ".flac",
+    ".aac",
+    ".m4a",
+
+    // Video
+    ".mp4",
+    ".mkv",
+    ".avi",
+    ".mov",
+    ".wmv",
+    ".webm",
+
+    // Archives
+    ".zip",
+    ".rar",
+    ".7z",
+    ".tar",
+    ".gz",
+
+    // Binary/System
+    ".exe",
+    ".dll",
+    ".iso",
+    ".dmg",
+    ".bin",
+    ".dat",
+    ".apk",
+    ".img",
+    ".so",
+    ".swf",
+    ".psd"
+  ]
+}
+```
+
+### Understanding Glob Patterns
+
+ccontext uses the `wcmatch` library for glob pattern matching, which gives you powerful but easy-to-use file matching capabilities. Here's a simple guide to using glob patterns:
+
+1. **Important Wildcards Explained:**
+
+   - `*` (single star): Matches anything in the current folder only
+
+     ```
+     "*.txt"      # Matches: a.txt, b.txt  (in current folder)
+     "*.txt"      # Won't match: sub/a.txt, deep/sub/b.txt
+     ```
+
+   - `**` (double star): Matches any number of folders
+
+     ```
+     "**/temp"    # Matches: temp, sub/temp, deep/sub/temp
+     "**/temp"    # Won't match: temp/file.txt
+     ```
+
+   - `**/*` (double star slash star): Matches everything in all folders
+
+     ```
+     "**/*.txt"   # Matches: a.txt, sub/b.txt, very/deep/c.txt
+     "**/*"       # Matches everything, everywhere
+     ```
+
+   - `?` matches any single character
+   - `.txt` matches exact file extension
+
+2. **Simple Examples:**
+
+   ```json
+   {
+     "excluded_folders_files": [
+       // Basic matching
+       "temp.txt", // Matches exact file temp.txt
+       "*.txt", // Matches all .txt files in root folder
+       "**/*.txt", // Matches all .txt files in any folder
+
+       // Folder matching
+       "temp/*", // Matches everything in temp folder
+       "**/temp", // Matches temp folder anywhere
+       "**/temp/**", // Matches everything in any temp folder
+
+       // Common use cases
+       "**/node_modules", // Matches node_modules folders anywhere
+       "**/__pycache__", // Matches Python cache folders
+       "**/*.pyc", // Matches Python compiled files
+       "build/*" // Matches everything in build folder
+     ]
+   }
+   ```
+
+3. **Tips for Beginners:**
+   - Start simple! Use `*.ext` for file extensions
+   - Use `**/` when you want to match in any folder
+   - Test your patterns with a small folder first
+   - When in doubt, be more specific
+   - Remember, patterns are case-sensitive
+
+The glob system is very forgiving - if you make a mistake, it usually just won't match anything rather than causing errors. Feel free to experiment!
+
+### Configuration Options Explained
+
+| Option                 | Description                     | Default       |
+| ---------------------- | ------------------------------- | ------------- |
+| verbose                | Enable detailed output          | false         |
+| max_tokens             | Maximum tokens before chunking  | 115000        |
+| model_type             | LLM model type for tokenization | "gpt-4o"      |
+| buffer_size            | Token buffer size (0-1)         | 0.05          |
+| excluded_folders_files | Glob patterns for exclusion     | [".git", ...] |
+| included_folders_files | Glob patterns for inclusion     | []            |
+| uploadable_extensions  | File extensions to upload       | [".pdf", ...] |
+
+## Binary File Handling
+
+ccontext supports handling binary files through the `uploadable_extensions` configuration.
+
+### Supported Binary Files
+
+- **Documents**: `.pdf`, `.doc`, `.docx`, `.xls`, `.xlsx`, `.ppt`, `.pptx`
+- **Images**: `.jpg`, `.jpeg`, `.png`, `.gif`, `.bmp`, `.tiff`, `.webp`, `.heic`
+- **Audio**: `.mp3`, `.wav`, `.ogg`, `.flac`, `.aac`, `.m4a`
+- **Video**: `.mp4`, `.mkv`, `.avi`, `.mov`, `.wmv`, `.webm`
+- **Archives**: `.zip`, `.rar`, `.7z`, `.tar`, `.gz`
+- **Binary/System**: `.exe`, `.dll`, `.iso`, `.dmg`, `.bin`, `.dat`, `.apk`, `.img`, `.so`, `.swf`, `.psd`
+
+### Binary File Processing
+
+- Binary files matching `uploadable_extensions` are prepared for upload to LLMs
+- File references are automatically copied to clipboard
+- Most LLM providers limit maximum of X binary files per prompt
+- Rate limits may apply based on your LLM provider
+
+Example configuration for handling specific file types:
+
+```json
+{
+  "uploadable_extensions": [".pdf", ".jpg", ".png", ".xlsx"]
+}
+```
+
+## Document Crawling
+
+The crawling feature allows you to gather documentation from websites for context.
+
+### Crawler Configuration
+
+```json
+{
+  "urls_to_crawl": [
+    {
+      "url": "https://docs.example.com",
+      "match": ["https://docs.example.com/**"],
+      "exclude": ["https://docs.example.com/internal/**"],
+      "selector": "",
+      "maxPagesToCrawl": 100,
+      "outputFileName": "docs.json",
       "maxTokens": 2000000
     }
   ]
 }
 ```
 
-## Use Cases
+### Crawler Options
 
-- **Codebase Context**: Send the entire codebase as context to an LLM in one go, avoiding the need to copy and paste snippets manually.
-- **Document Generation**: Generate detailed Markdown and PDF files of your directory structure and file contents, to easily RAG upon.]
-- **Documentation crawling**: crawl any (documentation) site there is, and use it for sending context
+- **url**: Starting URL for crawling
+- **match**: Glob patterns for URLs to include
+- **exclude**: Glob patterns for URLs to exclude
+- **selector**: CSS selector for content extraction
+- **maxPagesToCrawl**: Limit on pages to crawl
+- **outputFileName**: Name of output file
+- **maxTokens**: Maximum tokens to collect
 
-## Contributing
+### Best Practices
 
-We welcome contributions to `ccontext`! Please follow these steps to contribute:
+- Use specific `match` patterns
+- Respect robots.txt and site policies
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Commit your changes and push them to your branch.
-4. Submit a pull request with a description of your changes.
+## Use Cases and Examples
+
+### Common Usage Patterns
+
+1. **Analyzing a Python Project**
+
+```sh
+ccontext -p /path/to/project -e "venv|__pycache__|*.pyc"
+```
+
+2. **Processing Documentation**
+
+```sh
+ccontext -p ./docs --crawl -gm
+```
+
+3. **Including Specific Files**
+
+```sh
+ccontext -i "README.md|docs/*|*.py"
+```
+
+4. **Generating PDF and Markdown**
+
+```sh
+ccontext -g -gm  # Generates both PDF and Markdown
+```
+
+### Integration Examples
+
+1. **With GitHub Copilot**
+
+```sh
+ccontext -p . -e "node_modules|dist" -i "src/**/*.ts"
+```
+
+2. **With ChatGPT (webapp has max 32k) **
+
+```sh
+ccontext -p . --max_tokens 32000
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Clipboard Issues in SSH**
+
+   - Issue: Cannot copy to clipboard in SSH session
+   - Solution:
+     - Use SSH with X11 forwarding (`ssh -X user@host`), test using xeyes
+     - On Mac, install XQuartz (`brew install --cask xquartz`)
+
+2. **Token Limit Exceeded**
+
+   - Issue: Content too large for LLM
+   - Solution: Adjust `max_tokens` or use chunking feature
+
+3. **Binary File Handling**
+   - Issue: Binary files not being processed
+   - Solution: Check `uploadable_extensions` configuration
+
+### Platform-Specific Issues
+
+#### Windows: Use WSL if possible!
+
+Otherwise:
+
+- Issue: Path separators in configuration
+- Solution: Use forward slashes or escaped backslashes
+
+#### Linux
+
+- Issue: X11 clipboard support
+- Solution: Install xclip or xsel
+
+#### macOS
+
+- Issue: Clipboard permissions
+- Solution: Grant terminal app accessibility permissions
+
+## Development Guide
+
+### Project Structure
+
+```
+ccontext/
+├── ccontext/           # Main package directory
+│   ├── __init__.py
+│   ├── main.py         # Entry point
+│   ├── file_tree.py    # Tree operations
+│   └── ...
+├── tests/              # Test directory
+├── docs/               # Documentation
+└── examples/           # Example configurations
+```
+
+### Development Setup
+
+1. Clone the repository
+2. Create a virtual environment
+3. Install development dependencies
+4. Run tests
+
+```sh
+git clone https://github.com/oxillix/ccontext.git
+# or
+git clone git@github.com:NicolasArnouts/ccontext.git
+cd ccontext
+python3 -m venv venv
+source venv/bin/activate
+pip3 install -r requirements.txt
+pip3 install -e .
+```
+
+### Contributing Guidelines
+
+1. Fork the repository
+2. Create a feature branch
+3. Write tests for new features
+4. Submit a pull request
+
+### Code Style
+
+- Follow PEP 8 guidelines
+- use isort and black
+- Use type hints
+- Keep functions focused and small
 
 ## License
 
@@ -211,24 +534,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Inspired by the need to streamline the process of providing context to LLMs.
-- Thanks to the contributors and users who have provided valuable feedback and suggestions.
-
-## Future Ideas
-
-Here are some ideas that might be implemented in future versions of `ccontext`:
-
-- **Document Support**: Incorporate the ability to handle documents such as PDFs and image files in prompts.
-- **Binary File Handling**: Introduce mechanisms to manage non-text file types effectively.
+- Thanks to all contributors! 😊
+- Inspired by the need for better context handling in AI interactions.
+- Built with love and passion for the developer community! 💖
 
 ---
 
 Feel free to raise issues or contribute to the project. We appreciate your support!
 
-**Nicolas Arnouts**  
-[arnouts.software@gmail.com](mailto:arnouts.software@gmail.com)
+Happy coding adventures! 🚀
+**Nicolas Arnouts**
 
-[GitHub Repository](https://github.com/NicolasArnouts/ccontext)
+Looking for a skilled freelancer? I’m available for hire!
+Let’s collaborate — reach out to me at:
+arnouts.software@gmail.com
 
 ---
 

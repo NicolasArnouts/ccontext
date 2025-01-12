@@ -20,7 +20,7 @@ from ccontext.utils import initialize_environment, set_verbose
 DEFAULT_CONFIG_FILENAME = "config.json"
 USER_CONFIG_DIR = Path.home() / ".ccontext"
 USER_CONFIG_PATH = USER_CONFIG_DIR / DEFAULT_CONFIG_FILENAME
-CURRENT_CONFIG_FILENAME = ".conti-config.json"
+CURRENT_CONFIG_FILENAME = ".ccontext-config.json"
 DEFAULT_CONTEXT_PROMPT = """
 [[SYSTEM INSTRUCTIONS]]
 The following output represents a detailed directory structure and file contents from a specified root path. The file tree includes both excluded and included files and directories, clearly marking exclusions. Each file's content is displayed with comprehensive headings and separators to enhance readability and facilitate detailed parsing for extracting hierarchical and content-related insights. If the data represents a codebase, interpret and handle it as such, providing appropriate assistance as a programmer AI assistant. Always give full code file contents and the relative file paths of the files where you change code. Clearly explain what steps you are going to undertake, then proceed action and complete them one by one. Think ahead.
