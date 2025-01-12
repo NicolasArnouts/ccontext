@@ -2,6 +2,13 @@
 
 **ccontext (collect-context)** is a cross-platform utility designed to streamline the process of gathering and sending the context of a directory to large language models (LLMs) like ChatGPT-4o. Our mission is to make collecting and sending context to an LLM as easy as possible.
 
+
+## 🚀 Demo: Witness ccontext in Action! 🎥
+⚠️ Warning: You May Be Amazed! 🤯
+
+https://github.com/user-attachments/assets/c0a98dbc-d971-41dc-abe1-dad4be42e1ee
+
+
 ## Features
 
 **Features**
@@ -9,11 +16,11 @@
 - 🌟 **Easy Setup**: Quick installation and configuration.
 - 🌍 **Cross-Platform Support**: Supports Windows, macOS, and Linux.
 - 💾 **Binary File Support**: Handle various binary files including PDFs, Word documents, images, audio, and video files.
-- 🔧 **Configurable Exclusions and Inclusions**: Flexibly specify which files and directories to include or exclude.
-- ✂️ **Tokenization and Chunking**: Automatically handles tokenization and chunking to stay within LLM token limits.
-- 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📄 **Markdown and PDF Generation**: Generate detailed Markdown and PDF files of the directory structure and file contents.
 - 🌐 **Crawling of (documentation) Sites**: Crawl and gather data from multiple sites using a specified list of URLs.
+- ✂️ **Tokenization and Chunking**: Automatically handles tokenization and chunking to stay within LLM token limits.
+- 🔧 **Configurable Exclusions and Inclusions**: Flexibly specify which files and directories to include or exclude.
+- 🗣️ **Verbose Output**: Optional verbose mode for detailed output and debugging.
 - 📝 **Prompt Templates** (Upcoming): Create and use custom templates for different types of prompts.
 
 ## Table of Contents
