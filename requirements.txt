@@ -7,4 +7,5 @@ poetry==1.8.3
 wcmatch==9.0
 pypdf==4.3.1
 mammoth==1.9.0
-pyobjc-framework-Cocoa==10.3.2
+# on mac? uncomment below
+# pyobjc-framework-Cocoa==10.3.2
