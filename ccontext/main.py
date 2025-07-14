@@ -80,7 +80,11 @@ def main(
     config_includes = config.get("included_folders_files", [])
     config_excludes = config.get("excluded_folders_files", [])
 
-    excludes, includes = collect_excludes_includes(
+    # Always ensure crawl4ai output directories are excluded
+    if "**/crawl4ai-output" not in config_excludes:
+        config_excludes.append("**/crawl4ai-output/**")
+
+    excludes, includes, gitignore_handler = collect_excludes_includes(
         config_excludes,
         cmd_excludes,
         cmd_includes,
@@ -112,14 +116,30 @@ def main(
     # crawling should happen before tree building
     if crawl:
         urls_to_crawl = config.get("urls_to_crawl", [])
-        # print("urls_to_crawl", urls_to_crawl)
         for url_config in urls_to_crawl:
+            # Convert to crawl4ai config format if needed
+            if "url" not in url_config and "website" in url_config:
+                url_config["url"] = url_config.pop("website")
+
+            # Set default output filename if not present
+            if "outputFileName" not in url_config:
+                url = url_config["url"]
+                url_config["outputFileName"] = (
+                    f"crawl_result_{url.replace('://', '_').replace('/', '_')}.md"
+                )
+
             run_crawler(url_config)
 
-    # Build file tree once and use it
-    root_node = build_file_tree(root_path, excludes, includes, uploadable_extensions)
+        # Ensure crawl4ai output directories are excluded
+        if "**/crawl4ai-output" not in excludes:
+            excludes.append("**/crawl4ai-output/**")
 
-    # Always print the file tree in the CLI using the new format_file_tree function
+    # Build file tree with gitignore support
+    root_node = build_file_tree(
+        root_path, excludes, includes, uploadable_extensions, gitignore_handler
+    )
+
+    # Always print the file tree in the CLI using the format_file_tree function
     tree_output = format_file_tree(root_node, max_tokens, useColors=True)
     print(tree_output)
 
