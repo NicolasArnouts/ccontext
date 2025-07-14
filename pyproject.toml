@@ -34,6 +34,7 @@ reportlab = "^4.4.2"
 wcmatch = "^10.1"
 pypdf = "^5.8.0"
 mammoth = "^1.9.0"
+# crawl4ai dependency is installed on-demand when --crawl is used
 
 [tool.poetry.group.darwin.dependencies]
 pyobjc-framework-Cocoa = { version = "10.3.2", platform = "darwin" }
