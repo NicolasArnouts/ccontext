@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ccontext"
-version = "0.3.6"
+version = "0.3.5"
 description = "collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible."
 authors = ["Nicolas Arnouts <arnouts.software@gmail.com>"]
 readme = "README.md"
@@ -34,7 +34,6 @@ reportlab = "4.2.0"
 wcmatch = "9.0"
 pypdf = "4.3.1"
 mammoth = "^1.9.0"
-# crawl4ai dependency is installed on-demand when --crawl is used
 
 [tool.poetry.group.darwin.dependencies]
 pyobjc-framework-Cocoa = { version = "10.3.2", platform = "darwin" }

@@ -6,7 +6,7 @@ from typing import List, Tuple
 from colorama import Fore, Style
 
 from ccontext.file_node import FileNode
-from ccontext.file_system import GitignoreHandler, is_excluded
+from ccontext.file_system import is_excluded
 from ccontext.tokenizer import tokenize_text
 from ccontext.utils import (
     get_color_for_percentage,
@@ -17,11 +17,7 @@ from ccontext.utils import (
 
 
 def build_file_tree(
-    root_path: str,
-    excludes: List[str],
-    includes: List[str],
-    uploadable_extensions: set,
-    gitignore_handler: GitignoreHandler = None,
+    root_path: str, excludes: List[str], includes: List[str], uploadable_extensions: set
 ) -> FileNode:
     # Record the start time
     start_time = time.time()
@@ -29,7 +25,7 @@ def build_file_tree(
     def traverse_directory(current_path: str) -> FileNode:
         relative_path = os.path.relpath(current_path, start=root_path)
         node_type = "directory" if os.path.isdir(current_path) else "file"
-        excluded = is_excluded(relative_path, excludes, includes, gitignore_handler)
+        excluded = is_excluded(relative_path, excludes, includes)
         node = FileNode(
             os.path.basename(current_path),
             relative_path,
@@ -45,24 +41,13 @@ def build_file_tree(
             print(Fore.RED + relative_path + Style.RESET_ALL)
 
         if node_type == "directory" and not excluded:
-            try:
-                items = sorted(os.listdir(current_path))
-                for item in items:
-                    full_path = os.path.join(current_path, item)
-                    child_node = traverse_directory(full_path)
-                    node.add_child(child_node)
-            except PermissionError:
-                print(
-                    f"{Fore.YELLOW}Permission denied: {current_path}{Style.RESET_ALL}"
-                )
-            except Exception as e:
-                print(
-                    f"{Fore.YELLOW}Error accessing {current_path}: {str(e)}{Style.RESET_ALL}"
-                )
+            for item in sorted(os.listdir(current_path)):
+                full_path = os.path.join(current_path, item)
+                child_node = traverse_directory(full_path)
+                node.add_child(child_node)
         elif node_type == "file" and not excluded:
             tokens, content = tokenize_file_content(current_path, uploadable_extensions)
             node.set_tokens_and_content(tokens, content)
-
         return node
 
     return traverse_directory(root_path)
@@ -130,27 +115,8 @@ def format_file_tree(
         color = get_color_for_percentage(percentage) if useColors else ""
         reset = Style.RESET_ALL if useColors else ""
 
-        # Check if it's a binary file - use a safer approach to check files
-        try:
-            # Use absolute path or node path as fallback
-            if os.path.isabs(node.path):
-                file_path = node.path
-            else:
-                file_path = os.path.join(os.getcwd(), node.path)
-
-            # Check if file exists before attempting to determine if it's binary
-            if os.path.exists(file_path):
-                is_binary = is_binary_file(file_path)
-            else:
-                # If file doesn't exist, handle it gracefully
-                is_binary = False
-        except Exception as e:
-            # In case of any error, handle it gracefully
-            print(
-                f"{Fore.YELLOW}Error checking file {node.path}: {str(e)}{Style.RESET_ALL}"
-            )
-            is_binary = False
-
+        # Check if it's a binary file
+        is_binary = is_binary_file(os.path.join(os.getcwd(), node.path))
         file_emoji = "📎" if is_binary else "📄"
 
         # Format the name - yellow for binary files

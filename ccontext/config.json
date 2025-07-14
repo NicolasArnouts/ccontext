@@ -20,7 +20,7 @@
     "**/.git",
     "**/bin",
     "**/build",
-    "**/node_modules",
+    "**/node_modules/**",
     "**/venv",
     "**/__pycache__",
     "**/package-lock.json",
@@ -39,6 +39,7 @@
     "**/*.lock",
     "**/vendor",
     "**/laravel_access.log",
+    "**/gpt-crawler",
     "**/*.DS_Store",
     "**/*.tox"
   ],

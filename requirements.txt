@@ -7,6 +7,5 @@ poetry==1.8.3
 wcmatch==9.0
 pypdf==4.3.1
 mammoth==1.9.0
-# crawl4ai==0.6.3  # optional dependency, installed on-demand
 # on mac? uncomment below
 # pyobjc-framework-Cocoa==10.3.2

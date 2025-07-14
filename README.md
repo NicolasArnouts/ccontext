@@ -2,11 +2,12 @@
 
 **ccontext (collect-context)** is a cross-platform utility designed to streamline the process of gathering and sending the context of a directory to large language models (LLMs) like ChatGPT-4o. Our mission is to make collecting and sending context to an LLM as easy as possible.
 
-## 🚀 Demo: Witness ccontext in Action! 🎥
 
+## 🚀 Demo: Witness ccontext in Action! 🎥
 ⚠️ Warning: You May Be Amazed! 🤯
 
 https://github.com/user-attachments/assets/c0a98dbc-d971-41dc-abe1-dad4be42e1ee
+
 
 ## Features
 
@@ -200,6 +201,7 @@ ccontext looks for configuration in the following order:
     "**/*.lock",
     "**/vendor",
     "**/laravel_access.log",
+    "**/gpt-crawler",
     "**/*.DS_Store",
     "**/*.tox"
   ],
@@ -550,8 +552,8 @@ Feel free to raise issues or contribute to the project. We appreciate your suppo
 Happy coding adventures! 🚀
 **Nicolas Arnouts**
 
-Looking for a skilled freelancer? I'm available for hire!
-Let's collaborate — reach out to me at:
+Looking for a skilled freelancer? I’m available for hire!
+Let’s collaborate — reach out to me at:
 arnouts.software@gmail.com
 
 ---
@@ -561,37 +563,3 @@ arnouts.software@gmail.com
 [![PyPI version](https://badge.fury.io/py/ccontext.svg)](https://badge.fury.io/py/ccontext)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/NicolasArnouts/ccontext/blob/main/LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20|%20macOS%20|%20Linux-lightgrey.svg)]()
-
-## Using in WSL2 Environment
-
-When using ccontext's web crawling feature in WSL2, you can use crawl4ai for reliable web content extraction:
-
-1. First, set up the WSL2 environment:
-
-```bash
-python -m ccontext.fix_wsl
-```
-
-2. Then run the crawler as usual:
-
-```bash
-python -m ccontext --crawl
-```
-
-The crawler will automatically detect WSL2 and configure the environment appropriately. If you prefer to use the crawler directly:
-
-```bash
-python -m ccontext.run_crawlers --url https://example.com --output example.md
-```
-
-### WSL2 Troubleshooting
-
-If you encounter issues with the crawler in WSL2:
-
-1. Ensure Python and dependencies are properly installed
-2. Try running with explicit parameters:
-   ```bash
-   python -m ccontext.run_crawlers --url https://example.com --output example.md --max-pages 10
-   ```
-3. Check that any security software isn't blocking the network connections
-4. For more detailed logging, add the --verbose flag

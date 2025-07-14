@@ -66,34 +66,13 @@ def is_binary_file(file_path: str) -> bool:
     """
     Simple check if file is binary by attempting to read it as text.
     Returns True if file is binary, False if it's text.
-    Also handles file not found and permission errors.
     """
     try:
-        # First check if file exists
-        if not os.path.exists(file_path):
+        with open(file_path, "tr") as check_file:  # try open file in text mode
+            check_file.read()
             return False
-
-        # Check if it's a file and not a directory
-        if not os.path.isfile(file_path):
-            return False
-
-        # Try to read the first 1024 bytes to determine if it's binary
-        with open(file_path, "rb") as check_file:
-            chunk = check_file.read(1024)
-            # Check for null bytes which typically indicate binary content
-            if b"\x00" in chunk:
-                return True
-
-        # Try opening as text as a fallback
-        with open(file_path, "r", encoding="utf-8", errors="ignore") as check_file:
-            check_file.read(1024)
-            return False
-    except UnicodeDecodeError:
-        # If we get a decode error even with errors="ignore", it's likely binary
+    except UnicodeDecodeError:  # if fail then file is non-text (binary)
         return True
-    except (IOError, OSError, FileNotFoundError, PermissionError):
-        # Handle other file access errors gracefully
-        return False
 
 
 def should_upload_file(file_path: str, uploadable_extensions: set) -> bool:
