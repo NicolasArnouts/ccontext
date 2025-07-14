@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "ccontext"
-version = "0.3.5"
+version = "0.3.7"
 description = "collect-context: Makes the process of collecting and sending context to an LLM like ChatGPT-4o as easy as possible."
 authors = ["Nicolas Arnouts <arnouts.software@gmail.com>"]
 readme = "README.md"
@@ -18,21 +18,21 @@ classifiers = [
   "Topic :: Software Development :: Build Tools",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.6",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9"
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12"
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8,<4"
+python = ">=3.9,<4"
 colorama = "0.4.6"
 pyperclip = "1.9.0"
-tiktoken = "0.7.0"
+tiktoken = "^0.9.0"
 pathspec = "0.12.1"
-reportlab = "4.2.0"
-wcmatch = "9.0"
-pypdf = "4.3.1"
+reportlab = "^4.4.2"
+wcmatch = "^10.1"
+pypdf = "^5.8.0"
 mammoth = "^1.9.0"
 
 [tool.poetry.group.darwin.dependencies]
